@@ -52,28 +52,28 @@ public class CameraConstants {
      * Limelight 3A horizontal field of view (degrees)
      * This is a fixed specification of the Limelight 3A
      */
-    public static final double CAMERA_FOV_HORIZONTAL = 59.6;
+    public static final double CAMERA_FOV_HORIZONTAL = 54.5;
     
     /**
      * Limelight 3A vertical field of view (degrees)
      * This is a fixed specification of the Limelight 3A
      */
-    public static final double CAMERA_FOV_VERTICAL = 45.7;
+    public static final double CAMERA_FOV_VERTICAL = 42;
     
     /**
      * Camera resolution width (pixels)
      */
-    public static final int CAMERA_WIDTH = 320;
+    public static final int CAMERA_WIDTH = 640;
     
     /**
      * Camera resolution height (pixels)
      */
-    public static final int CAMERA_HEIGHT_PIXELS = 240;
+    public static final int CAMERA_HEIGHT_PIXELS = 480;
     
     /**
      * Camera frame rate (fps)
      */
-    public static final int CAMERA_FPS = 120;
+    public static final int CAMERA_FPS = 90;
     
     // ========== GAME PIECE SPECIFICATIONS ==========
     

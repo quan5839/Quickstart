@@ -1257,6 +1257,13 @@ public class RobotStateMachine {
             return;
         }
 
+        // Prevent mode change during timer-based states (sensitive timing)
+        if (isInTimerBasedState()) {
+            String blockingState = getBlockingStateInfo();
+            telemetry.addData("Mode Switch Blocked", "Timer-based state: " + blockingState);
+            return;
+        }
+
         currentMode = newMode;
         RobotLog.dd("RobotStateMachine", "Mode: %s", newMode);
 
@@ -1264,7 +1271,7 @@ public class RobotStateMachine {
         if (newMode == RobotMode.SPECIMEN) {
             changeExternalState(RobotState.INIT);
             changeState(RobotState.HOLD);
-        } else {
+        } else if (newMode == RobotMode.SAMPLE) {
             changeExternalState(RobotState.INIT);
             changeState(RobotState.INIT);
         }
@@ -1437,6 +1444,145 @@ public class RobotStateMachine {
 
     private SampleColor getDirectSampleColor() {
         return robot.intake.getSampleColor();
+    }
+
+    private SampleColor getDirectOuttakeSampleColor() {
+        return robot.outtake.getSampleColor();
+    }
+
+    /**
+     * Check if the current state is timer-based and should block mode switching
+     * @return true if mode switching should be blocked due to timer-based state
+     */
+    private boolean isInTimerBasedState() {
+        // Check if we're waiting for an end delay (most sensitive timing)
+        if (!waitingForEndDelay.isEmpty()) {
+            return true;
+        }
+
+        // Check current state for timer-based blocking
+        boolean currentStateBlocked = isStateTimerBlocking(currentState, false);
+
+        // Check external state for timer-based blocking (specimen mode)
+        boolean externalStateBlocked = isStateTimerBlocking(externalState, true);
+
+        return currentStateBlocked || externalStateBlocked;
+    }
+
+    /**
+     * Check if a specific state should block mode switching due to active timers
+     * @param state The state to check
+     * @param isExternalState Whether this is an external state (affects timer selection)
+     * @return true if mode switching should be blocked due to active timer
+     */
+    private boolean isStateTimerBlocking(RobotState state, boolean isExternalState) {
+        if (state == null) return false;
+
+        // Get the appropriate timer and transitions for this state
+        double currentTimeMs = isExternalState ? externalStateTimer.milliseconds() : stateTimer.milliseconds();
+        StateTransition[] transitions = getTransitionsForState(state, isExternalState);
+
+        if (transitions == null || transitions.length == 0) return false;
+
+        // Check if any transition in this state has an active timer or immediate action
+        for (StateTransition transition : transitions) {
+            if (transition.waitTimeMs > 0) {
+                // Timer-based state: block mode switching only if timer hasn't elapsed
+                if (currentTimeMs < transition.waitTimeMs) {
+                    return true; // Timer still running, block mode switching
+                }
+                // Timer has elapsed - check if it has gamepad input
+                if (transition.condition != null) {
+                    // Has gamepad input after timer - allow mode switching
+                    return false;
+                }
+                // Pure timer state (no gamepad input) - continue blocking
+                return true;
+            } else if (transition.waitTimeMs == 0 && transition.condition == null && transition.action != null) {
+                // Immediate action state (0 timer, no condition, has action) - always block
+                // These states execute hardware actions immediately and are sensitive
+                return true;
+            }
+        }
+
+        return false; // No timers in this state
+    }
+
+    /**
+     * Get detailed information about which state is blocking mode switching
+     * @return String describing the blocking state and timing info
+     */
+    private String getBlockingStateInfo() {
+        // Check for end delay first (highest priority)
+        if (!waitingForEndDelay.isEmpty()) {
+            return "End delay active";
+        }
+
+        // Check current state
+        if (isStateTimerBlocking(currentState, false)) {
+            double currentTimeMs = stateTimer.milliseconds();
+            StateTransition[] transitions = getTransitionsForState(currentState, false);
+            if (transitions != null && transitions.length > 0) {
+                for (StateTransition transition : transitions) {
+                    if (transition.waitTimeMs > 0) {
+                        double remaining = transition.waitTimeMs - currentTimeMs;
+                        if (remaining > 0) {
+                            return String.format("%s (%.0fms remaining)", currentState, remaining);
+                        } else if (transition.condition == null) {
+                            return String.format("%s (pure timer)", currentState);
+                        }
+                    } else if (transition.waitTimeMs == 0 && transition.condition == null && transition.action != null) {
+                        return String.format("%s (immediate action)", currentState);
+                    }
+                }
+            }
+            return currentState.toString();
+        }
+
+        // Check external state
+        if (isStateTimerBlocking(externalState, true)) {
+            double currentTimeMs = externalStateTimer.milliseconds();
+            StateTransition[] transitions = getTransitionsForState(externalState, true);
+            if (transitions != null && transitions.length > 0) {
+                for (StateTransition transition : transitions) {
+                    if (transition.waitTimeMs > 0) {
+                        double remaining = transition.waitTimeMs - currentTimeMs;
+                        if (remaining > 0) {
+                            return String.format("%s (%.0fms remaining)", externalState, remaining);
+                        } else if (transition.condition == null) {
+                            return String.format("%s (pure timer)", externalState);
+                        }
+                    } else if (transition.waitTimeMs == 0 && transition.condition == null && transition.action != null) {
+                        return String.format("%s (immediate action)", externalState);
+                    }
+                }
+            }
+            return externalState.toString();
+        }
+
+        return "Unknown blocking state";
+    }
+
+    /**
+     * Get transitions for a specific state
+     * @param state The state to get transitions for
+     * @param isExternalState Whether this is an external state
+     * @return Array of transitions for the state, or null if not found
+     */
+    private StateTransition[] getTransitionsForState(RobotState state, boolean isExternalState) {
+        if (state == null) return null;
+
+        try {
+            if (isExternalState) {
+                return specimenExternalTransitionArray[state.ordinal()];
+            } else if (currentMode == RobotMode.SPECIMEN) {
+                return specimenTransitionArray[state.ordinal()];
+            } else {
+                return sampleTransitionArray[state.ordinal()];
+            }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     /**

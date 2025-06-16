@@ -98,11 +98,11 @@ public class SpecimenAutoSafe extends OpMode {
     private final Pose pushRetrieve1Pose = new Pose(SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP1_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
 
     /** Middle (Second) Sample from the Spike Mark */
-    private final Pose pushPickup2Pose = new Pose(SpecimenAutoConstant.PUSH_PICKUP2_X, SpecimenAutoConstant.PUSH_PICKUP2_Y, Math.toRadians(pedroPathing.constants.SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose pushPickup2Pose = new Pose(SpecimenAutoConstant.PUSH_PICKUP2_X, SpecimenAutoConstant.PUSH_PICKUP2_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
 
     private final Pose pushPickup2ControlPose = new Pose(SpecimenAutoConstant.PUSH_PICKUP2_CONTROL_X, SpecimenAutoConstant.PUSH_PICKUP2_CONTROL_Y);
 
-    private final Pose retrieve2Pose = new Pose(SpecimenAutoConstant.PUSH_PICKUP2_X, SpecimenAutoConstant.PUSH_PICKUP2_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose retrieve2Pose = new Pose(SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP2_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
 
 
     /** Highest (Third) Sample from the Spike Mark */
@@ -110,13 +110,13 @@ public class SpecimenAutoSafe extends OpMode {
 
     private final Pose pushPickup3ControlPose = new Pose(SpecimenAutoConstant.PUSH_PICKUP3_CONTROL_X, SpecimenAutoConstant.PUSH_PICKUP3_CONTROL_Y);
 
-    private final Pose retrieve3Pose = new Pose(SpecimenAutoConstant.PUSH_PICKUP3_X, SpecimenAutoConstant.PUSH_PICKUP3_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose retrieve3Pose = new Pose(SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP3_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
 
     private final Pose prepGrabSpecimenPose = new Pose(SpecimenAutoConstant.PREP_GRAB_SPECIMEN_X, SpecimenAutoConstant.PREP_AND_GRAB_SPECIMEN_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
     private final Pose prepGrabSpecimenPoseControl1 = new Pose(SpecimenAutoConstant.PREP_GRAB_SPECIMEN_CONTROL_X_1, SpecimenAutoConstant.PREP_GRAB_SPECIMEN_CONTROL_Y_1);
     private final Pose prepGrabSpecimenPoseControl2 = new Pose(SpecimenAutoConstant.PREP_GRAB_SPECIMEN_CONTROL_X_2, SpecimenAutoConstant.PREP_GRAB_SPECIMEN_CONTROL_Y_2);
 
-    private final Pose grabSpecimenPose = new Pose(SpecimenAutoConstant.GRAB_SPECIMEN_X, SpecimenAutoConstant.PREP_AND_GRAB_SPECIMEN_Y);
+    private final Pose grabSpecimenPose = new Pose(SpecimenAutoConstant.GRAB_SPECIMEN_X, SpecimenAutoConstant.PREP_AND_GRAB_SPECIMEN_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
 
     private final Pose scoreSpecimen1Pose = new Pose(SpecimenAutoConstant.SCORE_X, SpecimenAutoConstant.SCORE1_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
     private final Pose scoreSpecimen2Pose = new Pose(SpecimenAutoConstant.SCORE_X, SpecimenAutoConstant.SCORE2_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
@@ -134,7 +134,7 @@ public class SpecimenAutoSafe extends OpMode {
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
     private Path scorePreload, park, returnToStart;
-    private PathChain pushPickup1, pushPickup2, pushPickup3,
+    private PathChain pushPickup1Prep, pushPickup1, pushPickup2, pushPickup3,
             retrievePickup1, retrievePickup2, retrievePickup3,
             prepGrabSpecimen1, prepGrabSpecimen2, prepGrabSpecimen3, prepGrabSpecimen4,
             scoreSpecimen1, scoreSpecimen2, scoreSpecimen3, scoreSpecimen4,
@@ -163,9 +163,10 @@ public class SpecimenAutoSafe extends OpMode {
         scorePreload = new Path(new BezierLine(new Point(startPose), new Point(scorePreLoadPose)));
         scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePreLoadPose.getHeading());
 
-        Path pushPickup1PrepPath = new Path(new BezierCurve(new Point(scorePreLoadPose), new Point(pushPickup1ControlPose), new Point(pushPickup1PrepPose)));
+        // Push pickup 1 sequence: prep -> push -> retrieve
+        Path pushPickup1PrepPath = new Path(new BezierCurve(new Point(scorePreLoadPose), new Point(pushPickup1PrepControlPose), new Point(pushPickup1PrepPose)));
         pushPickup1PrepPath.setLinearHeadingInterpolation(scorePreLoadPose.getHeading(), pushPickup1PrepPose.getHeading());
-        pushPickup1 = new PathChain(pushPickup1PrepPath);
+        pushPickup1Prep = new PathChain(pushPickup1PrepPath);
 
         Path pushPickup1Path = new Path(new BezierCurve(new Point(pushPickup1PrepPose), new Point(pushPickup1ControlPose), new Point(pushPickup1Pose)));
         pushPickup1Path.setLinearHeadingInterpolation(pushPickup1PrepPose.getHeading(), pushPickup1Pose.getHeading());
@@ -221,8 +222,8 @@ public class SpecimenAutoSafe extends OpMode {
         prepGrabSpecimen3Path.setLinearHeadingInterpolation(scoreSpecimen2Pose.getHeading(), prepGrabSpecimenPose.getHeading());
         prepGrabSpecimen3 = new PathChain(prepGrabSpecimen3Path);
 
-        Path scoreSpecimen3Path = new Path(new BezierCurve(new Point(grabSpecimenPose), new Point(grabSpecimenPose), new Point(scoreSpecimenPose)));
-        scoreSpecimen3Path.setLinearHeadingInterpolation(grabSpecimenPose.getHeading(), scoreSpecimenPose.getHeading());
+        Path scoreSpecimen3Path = new Path(new BezierCurve(new Point(grabSpecimenPose), new Point(scoreSpecimenControlPose), new Point(scoreSpecimen3Pose)));
+        scoreSpecimen3Path.setLinearHeadingInterpolation(grabSpecimenPose.getHeading(), scoreSpecimen3Pose.getHeading());
         scoreSpecimen3 = new PathChain(scoreSpecimen3Path);
 
 
@@ -276,227 +277,184 @@ public class SpecimenAutoSafe extends OpMode {
         case 2:
             if(stateMachine.getCurrentState() == RobotState.INIT) {
                 stateMachine.changeState(RobotState.HOLD);
-                follower.followPath(grabPickup1, true);
+                follower.followPath(pushPickup1Prep, true);
                 setPathState(3);
             }
 
             break;
         case 3:
             if(!follower.isBusy()) {
-                // Start turret movement and extend slides immediately
-                rotateTurret(SpecimenAutoConstant.SAMPLE1_TURRET_POS);
-                rotateClawWrist(SpecimenAutoConstant.SAMPLE1_WRIST_POS);
-                robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
-                robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
-                robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
-
-                if (pathTimerElapsed(SpecimenAutoConstant.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
-                    stateMachine.changeExternalState(RobotState.SPECIMEN_INTAKE_GRAB);
-                    if (stateMachine.getCurrentState() == RobotState.SPECIMEN_INTAKE_CHECK_SAMPLE){
-                        robot.intake.setIntakeTurretPosition(SpecimenAutoConstant.RETRIEVE_SAMPLE_TURRET_POS);
-                        robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_REMOVE);
-                        robot.intake.setIntakeElbowPosition(IntakeConstants.SHOULDER_REMOVE);
-                        follower.followPath(retrievePickup1, true);
-                        setPathState(4);
-                    }
-                }
-
+                // Move to push position for sample 1
+                follower.followPath(pushPickup1, true);
+                setPathState(4);
             }
             break;
         case 4:
             if (!follower.isBusy()){
-                robot.intake.setIntakeClawPosition(IntakeConstants.CLAW_OPEN);
-                if (pathTimerElapsed((double) IntakeConstants.CLAW_CLOSED_TIME / 1000)){
-                    follower.followPath(grabPickup2);
-                    setPathState(5);
-                }
+                // Push sample 1 into pickup area - no intake operations needed
+                follower.followPath(retrievePickup1, true);
+                setPathState(5);
             }
             break;
-
         case 5:
-            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
-            if(!follower.isBusy()) {
-                // Start turret movement and extend slides immediately
-                rotateTurret(SpecimenAutoConstant.SAMPLE2_TURRET_POS);
-                rotateClawWrist(SpecimenAutoConstant.SAMPLE2_WRIST_POS);
-                robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
-                robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
-                robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
-
-                if (pathTimerElapsed(SpecimenAutoConstant.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
-                    stateMachine.changeExternalState(RobotState.SPECIMEN_INTAKE_GRAB);
-                    if (stateMachine.getCurrentState() == RobotState.SPECIMEN_INTAKE_CHECK_SAMPLE){
-                        robot.intake.setIntakeTurretPosition(SpecimenAutoConstant.RETRIEVE_SAMPLE_TURRET_POS);
-                        robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_REMOVE);
-                        robot.intake.setIntakeElbowPosition(IntakeConstants.SHOULDER_REMOVE);
-                        follower.followPath(retrievePickup2, true);
-                        setPathState(6);
-                    }
-                }
+            if (!follower.isBusy()){
+                // Move to push sample 2
+                follower.followPath(pushPickup2);
+                setPathState(6);
             }
             break;
+
         case 6:
-            if (!follower.isBusy()){
-                robot.intake.setIntakeClawPosition(IntakeConstants.CLAW_OPEN);
-                if (pathTimerElapsed((double) IntakeConstants.CLAW_CLOSED_TIME / 1000)){
-                    follower.followPath(grabPickup3);
-                    setPathState(7);
-                }
+            if(!follower.isBusy()) {
+                // Push sample 2 into pickup area - no intake operations needed
+                follower.followPath(retrievePickup2, true);
+                setPathState(7);
             }
             break;
         case 7:
-            if(!follower.isBusy()) {
-                // Start turret movement and extend slides immediately
-                rotateTurret(SpecimenAutoConstant.SAMPLE3_TURRET_POS);
-                rotateClawWrist(SpecimenAutoConstant.SAMPLE3_WRIST_POS);
-                robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
-                robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
-                robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
-
-                if (pathTimerElapsed(SpecimenAutoConstant.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
-                    stateMachine.changeExternalState(RobotState.SPECIMEN_INTAKE_GRAB);
-                    if (stateMachine.getCurrentState() == RobotState.SPECIMEN_INTAKE_CHECK_SAMPLE){
-                        robot.intake.setIntakeTurretPosition(SpecimenAutoConstant.RETRIEVE_SAMPLE_TURRET_POS);
-                        robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_REMOVE);
-                        robot.intake.setIntakeElbowPosition(IntakeConstants.SHOULDER_REMOVE);
-                        follower.followPath(retrievePickup3, true);
-                        setPathState(8);
-                    }
-                }
+            if (!follower.isBusy()){
+                // Move to push sample 3
+                follower.followPath(pushPickup3);
+                setPathState(8);
             }
             break;
         case 8:
+            if(!follower.isBusy()) {
+                // Push sample 3 into pickup area - no intake operations needed
+                follower.followPath(retrievePickup3, true);
+                setPathState(9);
+            }
+            break;
+        case 9:
             if (!follower.isBusy()){
-                robot.intake.setIntakeClawPosition(IntakeConstants.CLAW_OPEN);
-                if (pathTimerElapsed((double) IntakeConstants.CLAW_CLOSED_TIME / 1000)){
-                    robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_HOLD);
-                    stateMachine.changeState(RobotState.INIT);
-                    follower.followPath(prepGrabSpecimen1);
-                    setPathState(9);
-                }
+                // All samples pushed, now prepare to grab first specimen
+                stateMachine.changeState(RobotState.INIT);
+                follower.followPath(prepGrabSpecimen1);
+                setPathState(10);
             }
             break;
 
-        case 9:
+        case 10:
             if (!follower.isBusy()){
                 follower.followPath(grabSpecimen);
-                setPathState(10);
+                setPathState(11);
             }
+            break;
 
-        case 10:
+        case 11:
             if (!follower.isBusy()){
                 robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
                 if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
                     follower.followPath(scoreSpecimen1);
-                    setPathState(11);
+                    setPathState(12);
                 }
-            }
-            break;
-        case 11:
-            if(!follower.isBusy()) {
-                robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
-                stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
-                setPathState(12);
             }
             break;
         case 12:
-                if(stateMachine.getCurrentState() == RobotState.INIT) {
-                    follower.followPath(prepGrabSpecimen2, true);
-                    setPathState(13);
-                }
+            if(!follower.isBusy()) {
+                robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
+                stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
+                setPathState(13);
+            }
             break;
         case 13:
-                if(!follower.isBusy()) {
-                    follower.followPath(grabSpecimen, true);
+                if(stateMachine.getCurrentState() == RobotState.INIT) {
+                    follower.followPath(prepGrabSpecimen2, true);
                     setPathState(14);
                 }
             break;
-
         case 14:
+                if(!follower.isBusy()) {
+                    follower.followPath(grabSpecimen, true);
+                    setPathState(15);
+                }
+            break;
+
+        case 15:
             if (!follower.isBusy()){
                 robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
                 if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
                     follower.followPath(scoreSpecimen2);
-                    setPathState(15);
+                    setPathState(16);
                 }
             }
             break;
-        case 15:
+        case 16:
             if(!follower.isBusy()) {
                 robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
                 stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
-                setPathState(16);
-            }
-            break;
-        case 16:
-            if(stateMachine.getCurrentState() == RobotState.INIT) {
-                follower.followPath(prepGrabSpecimen3, true);
                 setPathState(17);
             }
             break;
-
         case 17:
-            if(!follower.isBusy()) {
-                follower.followPath(grabSpecimen, true);
+            if(stateMachine.getCurrentState() == RobotState.INIT) {
+                follower.followPath(prepGrabSpecimen3, true);
                 setPathState(18);
             }
             break;
 
         case 18:
+            if(!follower.isBusy()) {
+                follower.followPath(grabSpecimen, true);
+                setPathState(19);
+            }
+            break;
+
+        case 19:
             if (!follower.isBusy()){
                 robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
                 if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
                     follower.followPath(scoreSpecimen3);
-                    setPathState(19);
+                    setPathState(20);
                 }
             }
             break;
-        case 19:
+        case 20:
             if(!follower.isBusy()) {
                 robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
                 stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
-                setPathState(20);
-            }
-            break;
-        case 20:
-            if(stateMachine.getCurrentState() == RobotState.INIT) {
-                follower.followPath(prepGrabSpecimen4, true);
                 setPathState(21);
             }
             break;
-
         case 21:
-            if(!follower.isBusy()) {
-                follower.followPath(grabSpecimen, true);
+            if(stateMachine.getCurrentState() == RobotState.INIT) {
+                follower.followPath(prepGrabSpecimen4, true);
                 setPathState(22);
             }
             break;
 
         case 22:
+            if(!follower.isBusy()) {
+                follower.followPath(grabSpecimen, true);
+                setPathState(23);
+            }
+            break;
+
+        case 23:
             if (!follower.isBusy()){
                 robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
                 if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
                     follower.followPath(scoreSpecimen4);
-                    setPathState(19);
+                    setPathState(24);
                 }
             }
             break;
-        case 23:
+        case 24:
             if(!follower.isBusy()) {
                 robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
                 stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
-                setPathState(24);
-            }
-            break;
-
-        case 24:
-            if(stateMachine.getCurrentState() == RobotState.INIT) {
-                follower.followPath(park);
-                setPathState(24);
+                setPathState(25);
             }
             break;
 
         case 25:
+            if(stateMachine.getCurrentState() == RobotState.INIT) {
+                follower.followPath(park);
+                setPathState(26);
+            }
+            break;
+
+        case 26:
             if (!follower.isBusy()){
                 robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
                 setPathState(-1);

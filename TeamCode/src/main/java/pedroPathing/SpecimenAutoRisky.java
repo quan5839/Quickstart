@@ -212,8 +212,8 @@ public class SpecimenAutoRisky extends OpMode {
         prepGrabSpecimen3Path.setLinearHeadingInterpolation(scoreSpecimen2Pose.getHeading(), prepGrabSpecimenPose.getHeading());
         prepGrabSpecimen3 = new PathChain(prepGrabSpecimen3Path);
 
-        Path scoreSpecimen3Path = new Path(new BezierCurve(new Point(grabSpecimenPose), new Point(grabSpecimenPose), new Point(scoreSpecimenPose)));
-        scoreSpecimen3Path.setLinearHeadingInterpolation(grabSpecimenPose.getHeading(), scoreSpecimenPose.getHeading());
+        Path scoreSpecimen3Path = new Path(new BezierCurve(new Point(grabSpecimenPose), new Point(scoreSpecimenControlPose), new Point(scoreSpecimen3Pose)));
+        scoreSpecimen3Path.setLinearHeadingInterpolation(grabSpecimenPose.getHeading(), scoreSpecimen3Pose.getHeading());
         scoreSpecimen3 = new PathChain(scoreSpecimen3Path);
 
 
@@ -373,6 +373,7 @@ public class SpecimenAutoRisky extends OpMode {
                 follower.followPath(grabSpecimen);
                 setPathState(10);
             }
+            break;
 
         case 10:
             if (!follower.isBusy()){
@@ -468,7 +469,7 @@ public class SpecimenAutoRisky extends OpMode {
                 robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
                 if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
                     follower.followPath(scoreSpecimen4);
-                    setPathState(19);
+                    setPathState(23);
                 }
             }
             break;
@@ -483,7 +484,7 @@ public class SpecimenAutoRisky extends OpMode {
         case 24:
             if(stateMachine.getCurrentState() == RobotState.INIT) {
                 follower.followPath(park);
-                setPathState(24);
+                setPathState(25);
             }
             break;
 
