@@ -21,9 +21,15 @@ android {
     compileSdkVersion 30
 
     compileOptions {
+        incremental true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    aaptOptions {
+        cruncherEnabled = false
+    }
+
     namespace = 'com.qualcomm.ftcrobotcontroller'
 }
 
