@@ -9,33 +9,33 @@ import pedroPathing.constants.IntakeConstants;
 import pedroPathing.util.ColorDetectionUtil;
 
 public class IntakeSystem {
-    private Servo intakeTurret;
-    private Servo intakeSlideRight;
-    private Servo intakeSlideLeft;
-    private Servo intakeShoulderRight;
-    private Servo intakeShoulderLeft;
-    private Servo intakeElbow;
-    private Servo intakeWrist;
-    private Servo intakeClaw;
-    private RevColorSensorV3 intakeColorSensor;
-    private DigitalChannel intakeSlideLimit; // Limit switch for slide hold position
-    private ColorDetectionUtil colorDetectionUtil;
-    private OpMode myOpMode;
+    private Servo turret;
+    private Servo slideRight;
+    private Servo slideLeft;
+    private Servo shoulderRight;
+    private Servo shoulderLeft;
+    private Servo elbow;
+    private Servo wrist;
+    private Servo claw;
+    private RevColorSensorV3 colorSensor;
+    private DigitalChannel slideLimit;
+    private ColorDetectionUtil colorUtil;
+    private OpMode opMode;
 
     public IntakeSystem(OpMode opMode) {
-        this.myOpMode = opMode;
+        this.opMode = opMode;
     }
 
     // Helper function for initializing servos safely
     private Servo safeInitServo(String name, Servo.Direction direction, Double servoMin, Double servoMax, Double position) {
         Servo servo = null;
         try {
-            servo = myOpMode.hardwareMap.get(Servo.class, name);
+            servo = opMode.hardwareMap.get(Servo.class, name);
             if (servoMin != null && servoMax != null) servo.scaleRange(servoMin, servoMax);
             if (direction != null) servo.setDirection(direction);
             if (position != null) servo.setPosition(position);
         } catch (Exception e) {
-            myOpMode.telemetry.addData("ERROR", name + " not found!");
+            opMode.telemetry.addData("ERROR", name + " not found!");
         }
         return servo;
     }
@@ -44,72 +44,59 @@ public class IntakeSystem {
     }
 
     public void init() {
-        intakeSlideRight = safeInitServo("intakeSlideRight", Servo.Direction.REVERSE, IntakeConstants.SLIDE_MIN);
-        intakeSlideLeft = safeInitServo("intakeSlideLeft", Servo.Direction.FORWARD, IntakeConstants.SLIDE_MIN);
-        intakeTurret = safeInitServo("intakeTurret", Servo.Direction.FORWARD, IntakeConstants.TURRET_MIN_OFFSET, IntakeConstants.TURRET_MAX_OFFSET, IntakeConstants.TURRET_MIDDLE);
-        intakeShoulderRight = safeInitServo("intakeShoulderRight", Servo.Direction.REVERSE, IntakeConstants.SHOULDER_INIT);
-        intakeShoulderLeft = safeInitServo("intakeShoulderLeft", Servo.Direction.FORWARD, IntakeConstants.SHOULDER_INIT);
-        intakeElbow = safeInitServo("intakeElbow", Servo.Direction.FORWARD, IntakeConstants.ELBOW_INIT);
-        intakeWrist = safeInitServo("intakeWrist", Servo.Direction.FORWARD, IntakeConstants.WRIST_MIDDLE);
-        intakeClaw = safeInitServo("intakeClaw", Servo.Direction.FORWARD, IntakeConstants.CLAW_OPEN);
+        slideRight = safeInitServo("intakeSlideRight", Servo.Direction.REVERSE, IntakeConstants.SLIDE_MIN);
+        slideLeft = safeInitServo("intakeSlideLeft", Servo.Direction.FORWARD, IntakeConstants.SLIDE_MIN);
+        turret = safeInitServo("intakeTurret", Servo.Direction.FORWARD, IntakeConstants.TURRET_MIN_OFFSET, IntakeConstants.TURRET_MAX_OFFSET, IntakeConstants.TURRET_MIDDLE);
+        shoulderRight = safeInitServo("intakeShoulderRight", Servo.Direction.REVERSE, IntakeConstants.SHOULDER_INIT);
+        shoulderLeft = safeInitServo("intakeShoulderLeft", Servo.Direction.FORWARD, IntakeConstants.SHOULDER_INIT);
+        elbow = safeInitServo("intakeElbow", Servo.Direction.FORWARD, IntakeConstants.ELBOW_INIT);
+        wrist = safeInitServo("intakeWrist", Servo.Direction.FORWARD, IntakeConstants.WRIST_MIDDLE);
+        claw = safeInitServo("intakeClaw", Servo.Direction.FORWARD, IntakeConstants.CLAW_OPEN);
         try {
-            intakeColorSensor = myOpMode.hardwareMap.get(RevColorSensorV3.class, "intakeColorSensor");
-            intakeColorSensor.enableLed(true);
-            colorDetectionUtil = new ColorDetectionUtil(intakeColorSensor, "intake");
+            colorSensor = opMode.hardwareMap.get(RevColorSensorV3.class, "intakeColorSensor");
+            colorSensor.enableLed(true);
+            colorUtil = new ColorDetectionUtil(colorSensor, "intake");
         } catch (Exception e) {
-            myOpMode.telemetry.addData("ERROR", "intakeColorSensor not found!");
-            colorDetectionUtil = new ColorDetectionUtil(null, "intake");
+            opMode.telemetry.addData("ERROR", "intakeColorSensor not found!");
+            colorUtil = new ColorDetectionUtil(null, "intake");
         }
 
-        // Initialize intake slide limit switch
         try {
-            intakeSlideLimit = myOpMode.hardwareMap.get(DigitalChannel.class, "intakeSlideLimitSwitch");
-            intakeSlideLimit.setMode(DigitalChannel.Mode.INPUT);
+            slideLimit = opMode.hardwareMap.get(DigitalChannel.class, "intakeSlideLimitSwitch");
+            slideLimit.setMode(DigitalChannel.Mode.INPUT);
         } catch (Exception e) {
-            myOpMode.telemetry.addData("ERROR", "intakeSlideLimitSwitch not found!");
-            intakeSlideLimit = null;
+            opMode.telemetry.addData("ERROR", "intakeSlideLimitSwitch not found!");
+            slideLimit = null;
         }
 
-
-        myOpMode.telemetry.update();
-        myOpMode.telemetry.update();
+        opMode.telemetry.update();
     }
 
     public boolean isSampleDetected(double position) {
-        return colorDetectionUtil.isSampleDetected();
+        return colorUtil.isSampleDetected();
     }
 
     public SampleColor getSampleColor() {
-        return colorDetectionUtil.getSampleColor();
+        return colorUtil.getSampleColor();
     }
 
-    /**
-     * Get raw RGB values for debugging - only call when needed to avoid performance impact
-     */
     public double[] getRawRGBValues() {
-        return colorDetectionUtil.getRawRGBValues();
+        return colorUtil.getRawRGBValues();
     }
 
     public boolean isSamplePresent() {
-        return colorDetectionUtil.isSamplePresent();
+        return colorUtil.isSamplePresent();
     }
 
-    /**
-     * Formal color detection with distance validation for intake system
-     * This provides a more robust color check similar to the outtake system
-     * @return true if a valid sample color is detected within proper distance
-     */
     public boolean isValidSampleDetected() {
-        if (colorDetectionUtil == null) return false;
+        if (colorUtil == null) return false;
 
-        // First check distance to ensure we have something close enough
-        double distance = colorDetectionUtil.getDistance();
+        double distance = colorUtil.getDistance();
         if (distance < 0 || distance > pedroPathing.constants.ControlConstants.COLOR_DETECTION_MAX_DISTANCE_CM) {
             return false;
         }
 
-        // Then check if we can detect a valid color
-        SampleColor detectedColor = colorDetectionUtil.getSampleColor();
+        SampleColor detectedColor = colorUtil.getSampleColor();
         return detectedColor != SampleColor.NONE;
     }
 
@@ -118,8 +105,8 @@ public class IntakeSystem {
      * @return Distance in CM, or -1 if sensor unavailable
      */
     public double getIntakeDistance() {
-        if (colorDetectionUtil == null) return -1;
-        return colorDetectionUtil.getDistance();
+        if (colorUtil == null) return -1;
+        return colorUtil.getDistance();
     }
 
     /**
@@ -128,35 +115,28 @@ public class IntakeSystem {
      * @return true if the limit switch is pressed (slide at hold position) or slide is more retracted, false otherwise
      */
     public boolean isSlideAtHoldPosition() {
-        // First check if limit switch is triggered (most reliable)
-        if (intakeSlideLimit != null) {
-            // Limit switch is "active low" - returns false when pressed
-            boolean limitSwitchPressed = !intakeSlideLimit.getState();
+        if (slideLimit != null) {
+            boolean limitSwitchPressed = !slideLimit.getState();
             if (limitSwitchPressed) {
                 return true;
             }
         }
 
-        // Fallback: check if slide position is at or more retracted than SLIDE_HOLD
-        // SLIDE_HOLD = 1.0, so any position >= SLIDE_HOLD means we're at or past the hold position
         double currentPosition = getIntakeSlidePosition();
         return currentPosition >= IntakeConstants.SLIDE_HOLD;
     }
 
     public double getIntakeElbowPosition() {
-        return intakeElbow.getPosition();
+        return elbow.getPosition();
     }
 
-    /**
-     * Returns the average position of both intake shoulder servos (left and right) if present, otherwise 0.
-     */
     public double getIntakeShoulderPosition() {
-        if (intakeShoulderLeft != null && intakeShoulderRight != null) {
-            return (intakeShoulderLeft.getPosition() + intakeShoulderRight.getPosition()) / 2.0;
-        } else if (intakeShoulderLeft != null) {
-            return intakeShoulderLeft.getPosition();
-        } else if (intakeShoulderRight != null) {
-            return intakeShoulderRight.getPosition();
+        if (shoulderLeft != null && shoulderRight != null) {
+            return (shoulderLeft.getPosition() + shoulderRight.getPosition()) / 2.0;
+        } else if (shoulderLeft != null) {
+            return shoulderLeft.getPosition();
+        } else if (shoulderRight != null) {
+            return shoulderRight.getPosition();
         } else {
             return 0;
         }
@@ -164,88 +144,80 @@ public class IntakeSystem {
 
 
     public void setIntakeElbowPosition(double position) {
-        if (intakeElbow != null){
-            intakeElbow.setPosition(position);
+        if (elbow != null){
+            elbow.setPosition(position);
         }
     }
 
-    /**
-     * Smart servo position setter that uses caching to reduce I2C traffic
-     * @param position Target position for intake elbow
-     * @return true if position was actually written to servo
-     */
     public boolean setIntakeElbowPositionSmart(double position) {
-        if (intakeElbow != null && myOpMode instanceof pedroPathing.BaseTeleop25152) {
-            pedroPathing.BaseTeleop25152 teleop = (pedroPathing.BaseTeleop25152) myOpMode;
-            // Note: This would require exposing robot hardware from BaseTeleop
-            // For now, we'll use the standard method
-            intakeElbow.setPosition(position);
+        if (elbow != null && opMode instanceof pedroPathing.BaseTeleop25152) {
+            elbow.setPosition(position);
             return true;
         }
         return false;
     }
 
     public void setIntakeShoulderPosition(double position) {
-        if (intakeShoulderLeft != null) {
-            intakeShoulderLeft.setPosition(position);
+        if (shoulderLeft != null) {
+            shoulderLeft.setPosition(position);
         }
-        if (intakeShoulderRight != null) {
-            intakeShoulderRight.setPosition(position);
+        if (shoulderRight != null) {
+            shoulderRight.setPosition(position);
         }
     }
 
     public void setIntakeSlidePosition(double position) {
-        if (intakeSlideLeft != null) {
-            intakeSlideLeft.setPosition(position);
+        if (slideLeft != null) {
+            slideLeft.setPosition(position);
         }
-        if (intakeSlideRight != null) {
-            intakeSlideRight.setPosition(position);
+        if (slideRight != null) {
+            slideRight.setPosition(position);
         }
     }
 
     public void setIntakeClawPosition(double position) {
-        if (intakeClaw != null) {
-            intakeClaw.setPosition(position);
+        if (claw != null) {
+            claw.setPosition(position);
         }
     }
 
     public double getIntakeClawPosition() {
-        if (intakeClaw != null) {
-            return intakeClaw.getPosition();
+        if (claw != null) {
+            return claw.getPosition();
         } else {
             return 0;
         }
     }
 
     public void openIntakeClaw() {
-        if (intakeClaw != null) {
-            intakeClaw.setPosition(IntakeConstants.CLAW_OPEN);
+        if (claw != null) {
+            claw.setPosition(IntakeConstants.CLAW_OPEN);
         }
     }
 
     public void closeIntakeClaw() {
-        if (intakeClaw != null) {
-            intakeClaw.setPosition(IntakeConstants.CLAW_CLOSED);
+        if (claw != null) {
+            claw.setPosition(IntakeConstants.CLAW_CLOSED);
         }
     }
 
     public void setIntakeWristPosition(double position) {
-        if (intakeWrist != null) {
-            intakeWrist.setPosition(position);
+        if (wrist != null) {
+            wrist.setPosition(position);
         }
     }
 
     public double getIntakeWristPosition() {
-        if (intakeWrist != null) {
-            return intakeWrist.getPosition();
+        if (wrist != null) {
+            return wrist.getPosition();
         } else {
             return 0;
         }
     }
 
     public void setIntakeWristBase() {
-        if (intakeWrist != null) {
-            intakeWrist.setPosition(IntakeConstants.WRIST_MIDDLE);
+        if (wrist != null) {
+            wrist.setPosition(IntakeConstants.WRIST_MIDDLE);
         }
     }
 
@@ -262,50 +234,52 @@ public class IntakeSystem {
     }
 
     public void setIntakeTurretPosition(double position) {
-        if (intakeTurret != null) {
-            intakeTurret.setPosition(position);
+        if (turret != null) {
+            turret.setPosition(position);
         }
     }
 
     public double getIntakeTurretPosition() {
-        if (intakeTurret != null) {
-            return intakeTurret.getPosition();
+        if (turret != null) {
+            return turret.getPosition();
         } else {
             return 0;
         }
     }
 
     public Servo getIntakeTurret() {
-        return intakeTurret;
+        return turret;
     }
 
     public Servo getIntakeSlideLeft() {
-        return intakeSlideLeft;
+        return slideLeft;
     }
 
     public Servo getIntakeSlideRight() {
-        return intakeSlideRight;
+        return slideRight;
     }
 
-    public Servo getIntakeElbow() { return intakeElbow; }
+    public Servo getIntakeElbow() {
+        return elbow;
+    }
 
     public Servo getIntakeShoulderLeft() {
-        return intakeShoulderLeft;
+        return shoulderLeft;
     }
 
     public Servo getIntakeShoulderRight() {
-        return intakeShoulderRight;
+        return shoulderRight;
     }
 
     public Servo getIntakeWrist() {
-        return intakeWrist;
+        return wrist;
     }
 
     public Servo getIntakeClaw() {
-        return intakeClaw;
+        return claw;
     }
 
     public RevColorSensorV3 getColorSensor() {
-        return intakeColorSensor;
+        return colorSensor;
     }
 }

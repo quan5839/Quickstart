@@ -15,7 +15,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-import pedroPathing.constants.BasketAutoConstant;
+import pedroPathing.constants.AutoConstants;
+import pedroPathing.constants.BasketAutoConstants;
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.IntakeConstants;
 import pedroPathing.constants.LConstants;
@@ -81,26 +82,26 @@ public class BasketAuto extends OpMode {
      * Lets assume the Robot is facing the human player and we want to score in the bucket */
 
     /** Start Pose of our robot */
-    private final Pose startPose = new Pose(BasketAutoConstant.START_X, BasketAutoConstant.START_Y, Math.toRadians(BasketAutoConstant.START_HEADING_DEG));
+    private final Pose startPose = new Pose(BasketAutoConstants.START_X, BasketAutoConstants.START_Y, Math.toRadians(BasketAutoConstants.START_HEADING_DEG));
 
     /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
-    private final Pose scorePose = new Pose(BasketAutoConstant.SCORE_X, BasketAutoConstant.SCORE_Y, Math.toRadians(BasketAutoConstant.SCORE_HEADING_DEG));
+    private final Pose scorePose = new Pose(BasketAutoConstants.SCORE_X, BasketAutoConstants.SCORE_Y, Math.toRadians(BasketAutoConstants.SCORE_HEADING_DEG));
 
     /** Lowest (First) Sample from the Spike Mark */
-    private final Pose pickup1Pose = new Pose(BasketAutoConstant.PICKUP1_X, BasketAutoConstant.PICKUP1_Y, Math.toRadians(BasketAutoConstant.PICKUP1_HEADING_DEG));
+    private final Pose pickup1Pose = new Pose(BasketAutoConstants.PICKUP1_X, BasketAutoConstants.PICKUP1_Y, Math.toRadians(BasketAutoConstants.PICKUP1_HEADING_DEG));
 
     /** Middle (Second) Sample from the Spike Mark */
-    private final Pose pickup2Pose = new Pose(BasketAutoConstant.PICKUP2_X, BasketAutoConstant.PICKUP2_Y, Math.toRadians(BasketAutoConstant.PICKUP2_HEADING_DEG));
+    private final Pose pickup2Pose = new Pose(BasketAutoConstants.PICKUP2_X, BasketAutoConstants.PICKUP2_Y, Math.toRadians(BasketAutoConstants.PICKUP2_HEADING_DEG));
 
     /** Highest (Third) Sample from the Spike Mark */
-    private final Pose pickup3Pose = new Pose(BasketAutoConstant.PICKUP3_X, BasketAutoConstant.PICKUP3_Y, Math.toRadians(BasketAutoConstant.PICKUP3_HEADING_DEG));
+    private final Pose pickup3Pose = new Pose(BasketAutoConstants.PICKUP3_X, BasketAutoConstants.PICKUP3_Y, Math.toRadians(BasketAutoConstants.PICKUP3_HEADING_DEG));
 
     /** Park Pose for our robot, after we do all of the scoring. */
-    private final Pose parkPose = new Pose(BasketAutoConstant.PARK_X, BasketAutoConstant.PARK_Y, Math.toRadians(BasketAutoConstant.PARK_HEADING_DEG));
+    private final Pose parkPose = new Pose(BasketAutoConstants.PARK_X, BasketAutoConstants.PARK_Y, Math.toRadians(BasketAutoConstants.PARK_HEADING_DEG));
 
     /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
      * The Robot will not go to this pose, it is used a control point for our bezier curve. */
-    private final Pose parkControlPose = new Pose(BasketAutoConstant.PARK_CONTROL_X, BasketAutoConstant.PARK_CONTROL_Y, Math.toRadians(BasketAutoConstant.PARK_CONTROL_HEADING_DEG));
+    private final Pose parkControlPose = new Pose(BasketAutoConstants.PARK_CONTROL_X, BasketAutoConstants.PARK_CONTROL_Y, Math.toRadians(BasketAutoConstants.PARK_CONTROL_HEADING_DEG));
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
     private Path scorePreload, park, returnToStart;
@@ -183,7 +184,7 @@ public class BasketAuto extends OpMode {
         try {
             switch (pathState) {
             case 0:
-                robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_BASKET);
+                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_BASKET);
                 stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_SLIDES_EXTEND);
                 follower.followPath(scorePreload);
                 setPathState(1);
@@ -193,11 +194,11 @@ public class BasketAuto extends OpMode {
                 /* Wait for outtake sequence to complete, then move to pickup with proper timing */
                 if(stateMachine != null && stateMachine.getCurrentState() == RobotState.SAMPLE_OUTTAKE_ELBOW_BASKET) {
                     /* Wait for claw release delay, then open claw */
-                    if(pathTimerElapsed(BasketAutoConstant.OUTTAKE_CLAW_RELEASE / 1000.0)) {
-                        robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_OPEN);
+                    if(pathTimerElapsed(AutoConstants.OUTTAKE_CLAW_RELEASE / 1000.0)) {
+                        robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
 
                         /* Wait additional time for claw to open, then change state and start path */
-                        if(pathTimerElapsed((BasketAutoConstant.OUTTAKE_CLAW_RELEASE + OuttakeConstants.OUTTAKE_CLAW_CLOSED_TIME) / 1000.0)) {
+                        if(pathTimerElapsed((AutoConstants.OUTTAKE_CLAW_RELEASE + OuttakeConstants.CLAW_CLOSED_TIME) / 1000.0)) {
                             stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_DUMP);
                             follower.followPath(grabPickup1, true);
                             setPathState(2);
@@ -209,14 +210,14 @@ public class BasketAuto extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
                     // Start turret movement and extend slides immediately
-                    rotateTurret(BasketAutoConstant.SAMPLE1_TURRET_POS);
-                    rotateClawWrist(BasketAutoConstant.SAMPLE1_WRIST_POS);
+                    rotateTurret(BasketAutoConstants.SAMPLE1_TURRET_POS);
+                    rotateClawWrist(BasketAutoConstants.SAMPLE1_WRIST_POS);
                     robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
                     robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
                     robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
 
 
-                    if(pathTimerElapsed(BasketAutoConstant.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
+                    if(pathTimerElapsed(AutoConstants.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
                         stateMachine.changeState(RobotState.SAMPLE_INTAKE_GRAB);
                         if (stateMachine.getCurrentState() == RobotState.SAMPLE_INTAKE_CHECK_SAMPLE){
                             stateMachine.changeState(RobotState.SAMPLE_INTAKE_WRIST_MOVE);
@@ -227,7 +228,7 @@ public class BasketAuto extends OpMode {
                 break;
             case 3:
                 if(stateMachine.getCurrentState() == RobotState.COMPLETE_INTAKE) {
-                    robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_BASKET);
+                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_BASKET);
                     stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_SLIDES_EXTEND);
 
                     follower.followPath(scorePickup1,true);
@@ -236,10 +237,10 @@ public class BasketAuto extends OpMode {
                 break;
             case 4:
                 if(stateMachine != null && stateMachine.getCurrentState() == RobotState.SAMPLE_OUTTAKE_ELBOW_BASKET) {
-                    if(pathTimerElapsed(BasketAutoConstant.OUTTAKE_CLAW_RELEASE / 1000.0)) {
-                        robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_OPEN);
+                    if(pathTimerElapsed(AutoConstants.OUTTAKE_CLAW_RELEASE / 1000.0)) {
+                        robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
 
-                        if(pathTimerElapsed((BasketAutoConstant.OUTTAKE_CLAW_RELEASE + OuttakeConstants.OUTTAKE_CLAW_CLOSED_TIME) / 1000.0)) {
+                        if(pathTimerElapsed((AutoConstants.OUTTAKE_CLAW_RELEASE + OuttakeConstants.CLAW_CLOSED_TIME) / 1000.0)) {
                             stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_DUMP);
                             follower.followPath(grabPickup2, true);
                             setPathState(5);
@@ -251,14 +252,14 @@ public class BasketAuto extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
                     // Start turret movement and extend slides immediately
-                    rotateTurret(BasketAutoConstant.SAMPLE2_TURRET_POS);
-                    rotateClawWrist(BasketAutoConstant.SAMPLE2_WRIST_POS);
+                    rotateTurret(BasketAutoConstants.SAMPLE2_TURRET_POS);
+                    rotateClawWrist(BasketAutoConstants.SAMPLE2_WRIST_POS);
                     robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
                     robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
                     robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
 
 
-                    if(pathTimerElapsed(BasketAutoConstant.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
+                    if(pathTimerElapsed(AutoConstants.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
                         stateMachine.changeState(RobotState.SAMPLE_INTAKE_GRAB);
                         if (stateMachine.getCurrentState() == RobotState.SAMPLE_INTAKE_CHECK_SAMPLE){
                             stateMachine.changeState(RobotState.SAMPLE_INTAKE_WRIST_MOVE);
@@ -271,7 +272,7 @@ public class BasketAuto extends OpMode {
                 /* Wait for intake sequence to complete, then move to score */
                 if(stateMachine.getCurrentState() == RobotState.COMPLETE_INTAKE) {
                     /* Intake complete, now go to score first sample */
-                    robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_BASKET);
+                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_BASKET);
                     stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_SLIDES_EXTEND);
 
                     follower.followPath(scorePickup2,true);
@@ -282,9 +283,9 @@ public class BasketAuto extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(stateMachine != null && stateMachine.getCurrentState() == RobotState.SAMPLE_OUTTAKE_ELBOW_BASKET) {
                     /* Wait for claw release delay, then open claw */
-                    if(pathTimerElapsed(BasketAutoConstant.OUTTAKE_CLAW_RELEASE / 1000.0)) {
-                        robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_OPEN);
-                        if(pathTimerElapsed((BasketAutoConstant.OUTTAKE_CLAW_RELEASE + OuttakeConstants.OUTTAKE_CLAW_CLOSED_TIME) / 1000.0)) {
+                    if(pathTimerElapsed(AutoConstants.OUTTAKE_CLAW_RELEASE / 1000.0)) {
+                        robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
+                        if(pathTimerElapsed((AutoConstants.OUTTAKE_CLAW_RELEASE + OuttakeConstants.CLAW_CLOSED_TIME) / 1000.0)) {
                             stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_DUMP);
                             follower.followPath(grabPickup3, true);
                             setPathState(8);
@@ -296,15 +297,15 @@ public class BasketAuto extends OpMode {
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
                     // Start turret movement and extend slides immediately
-                    rotateTurret(BasketAutoConstant.SAMPLE3_TURRET_POS);
-                    rotateClawWrist(BasketAutoConstant.SAMPLE3_WRIST_POS);
+                    rotateTurret(BasketAutoConstants.SAMPLE3_TURRET_POS);
+                    rotateClawWrist(BasketAutoConstants.SAMPLE3_WRIST_POS);
 
                     robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
                     robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
                     robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
 
 
-                    if(pathTimerElapsed(BasketAutoConstant.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
+                    if(pathTimerElapsed(AutoConstants.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
                         stateMachine.changeState(RobotState.SAMPLE_INTAKE_GRAB);
                         if (stateMachine.getCurrentState() == RobotState.SAMPLE_INTAKE_CHECK_SAMPLE){
                             stateMachine.changeState(RobotState.SAMPLE_INTAKE_WRIST_MOVE);
@@ -317,7 +318,7 @@ public class BasketAuto extends OpMode {
                 /* Wait for intake sequence to complete, then move to score third sample */
                 if(stateMachine.getCurrentState() == RobotState.COMPLETE_INTAKE) {
                     /* Intake complete, now go to score third sample */
-                    robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_BASKET);
+                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_BASKET);
                     stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_SLIDES_EXTEND);
                     follower.followPath(scorePickup3,true);
                     setPathState(10);
@@ -327,15 +328,15 @@ public class BasketAuto extends OpMode {
                 /* Final scoring - wait for outtake sequence to complete, then end */
                 if(stateMachine != null && stateMachine.getCurrentState() == RobotState.SAMPLE_OUTTAKE_ELBOW_BASKET) {
                     /* Wait for claw release delay, then open claw */
-                    if(pathTimerElapsed(BasketAutoConstant.OUTTAKE_CLAW_RELEASE / 1000.0)) {
-                        robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_OPEN);
+                    if(pathTimerElapsed(AutoConstants.OUTTAKE_CLAW_RELEASE / 1000.0)) {
+                        robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
 
                         /* Wait additional time for claw to open, then return to start */
-                        if(pathTimerElapsed((BasketAutoConstant.OUTTAKE_CLAW_RELEASE + OuttakeConstants.OUTTAKE_CLAW_CLOSED_TIME) / 1000.0)) {
+                        if(pathTimerElapsed((AutoConstants.OUTTAKE_CLAW_RELEASE + OuttakeConstants.CLAW_CLOSED_TIME) / 1000.0)) {
                             stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_DUMP);
 
                             /* Retract outtake slides before returning to start */
-                            robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_MIN);
+                            robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
 
                             /* Start return to start path */
                             follower.followPath(returnToStart, true);
@@ -524,7 +525,7 @@ public class BasketAuto extends OpMode {
 
         // Initialize the robot hardware
         robot.init();
-        robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
+        robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
 
         // Initialize the state machine with a dummy gamepad and sample mode for autonomous
         Gamepad dummyGamepad = new Gamepad();

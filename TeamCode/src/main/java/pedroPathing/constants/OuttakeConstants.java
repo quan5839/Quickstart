@@ -3,61 +3,118 @@ package pedroPathing.constants;
 import com.acmerobotics.dashboard.config.Config;
 
 /**
- * Constants for the outtake mechanism
+ * Constants for the outtake mechanism, organized alphabetically within sections
  */
 @Config
 public class OuttakeConstants {
     // Prevent instantiation
     private OuttakeConstants() {}
 
-    // PIDF coefficients for outtake slide control
-    public static double SLIDE_P = 20;  // Starting value, needs tuning
-    public static double SLIDE_I = 3;
-    public static double SLIDE_D = 0; // Starting value, needs tuning
-    public static double SLIDE_F = 0;  // Feed-forward for gravity compensation
+    // ========== CLAW POSITIONS ==========
 
-    // Target position for the outtake slide (in encoder ticks)
-    public static int SLIDE_TARGET_POSITION = 0;
-
-    // Claw positions
-    public static double CLAW_FULLY_OPEN = 0.575;
-    public static double CLAW_OPEN = 0.68;
+    /** Claw closed position */
     public static double CLAW_CLOSED = 0.87;
 
-    // Outtake elbow positions
-    public static double OUTTAKE_ELBOW_BASE = 0.0;
-    public static double OUTTAKE_ELBOW_GET_SPECIMEN = 0.98;
-    public static double OUTTAKE_ELBOW_SCORE_SPECIMEN = 0.19;
-    public static double OUTTAKE_ELBOW_BASKET = 0.7;
-    public static double OUTTAKE_ELBOW_INIT = 0.17;
-    public static double OUTTAKE_ELBOW_REST = 0.3;
-    public static double OUTTAKE_ELBOW_TRANSITION = 0.27;
+    /** Claw fully open position */
+    public static double CLAW_FULLY_OPEN = 0.575;
 
-    // Outtake wrist positions
-    public static double OUTTAKE_WRIST_GRAB = 0.54;
-    public static double OUTTAKE_WRIST_TUCK = 0.9;
-    public static double OUTTAKE_WRIST_BASKET = 0.65;
-    public static double OUTTAKE_WRIST_GET_SPECIMEN = 0.35;
-    public static double OUTTAKE_WRIST_SCORE_SPECIMEN = 0.62;
-    public static double OUTTAKE_WRIST_INIT = 0.475;
-    public static double OUTTAKE_WRIST_REST = 0.7;
-    public static double OUTTAKE_WRIST_TRANSITION = 0.2;
+    /** Claw open position */
+    public static double CLAW_OPEN = 0.68;
 
-    public static int OUTTAKE_CLAW_CLOSED_TIME = 100;
+    // ========== ELBOW POSITIONS ==========
 
-    public static int OUTTAKE_CLAW_FULL_CLOSED_TIME = 250;
+    /** Elbow base position */
+    public static double ELBOW_BASE = 0.0;
 
-    // Outtake slide positions
-    public static int OUTTAKE_SLIDE_MIN = 0;
-    public static int OUTTAKE_SLIDE_LIFT = 700;
-    public static int OUTTAKE_SLIDE_SCORE = 1550;
-    public static int OUTTAKE_SLIDE_BASKET = 2150;
-    public static int OUTTAKE_SLIDE_MAX = 2150;  // Maximum safe extension
+    /** Elbow basket position */
+    public static double ELBOW_BASKET = 0.7;
 
-    public static int OUTTAKE_SLIDE_ELBOW_PREP = 1000;  // Maximum safe extension
+    /** Elbow get specimen position */
+    public static double ELBOW_GET_SPECIMEN = 0.98;
 
+    /** Elbow initialization position */
+    public static double ELBOW_INIT = 0.17;
 
+    /** Elbow rest position */
+    public static double ELBOW_REST = 0.3;
 
-    // Wait time (ms) before allowing 'A' button transition in MOVE_INTAKE_WRIST
+    /** Elbow score specimen position */
+    public static double ELBOW_SCORE_SPECIMEN = 0.19;
+
+    /** Elbow transition position */
+    public static double ELBOW_TRANSITION = 0.27;
+
+    // ========== SLIDE CONTROL ==========
+
+    /** PIDF D coefficient for outtake slide control */
+    public static double SLIDE_D = 0;
+
+    /** PIDF F coefficient - feed-forward for gravity compensation */
+    public static double SLIDE_F = 0;
+
+    /** PIDF I coefficient for outtake slide control */
+    public static double SLIDE_I = 3;
+
+    /** PIDF P coefficient for outtake slide control */
+    public static double SLIDE_P = 20;
+
+    /** Target position for the outtake slide (in encoder ticks) */
+    public static int SLIDE_TARGET_POSITION = 0;
+
+    // ========== SLIDE POSITIONS ==========
+
+    /** Slide basket position */
+    public static int SLIDE_BASKET = 2150;
+
+    /** Slide elbow prep position */
+    public static int SLIDE_ELBOW_PREP = 1000;
+
+    /** Slide lift position */
+    public static int SLIDE_LIFT = 700;
+
+    /** Maximum safe extension */
+    public static int SLIDE_MAX = 2150;
+
+    /** Slide minimum position */
+    public static int SLIDE_MIN = 0;
+
+    /** Slide score position */
+    public static int SLIDE_SCORE = 1550;
+
+    // ========== TIMING CONSTANTS ==========
+
+    /** Claw closed time (ms) */
+    public static int CLAW_CLOSED_TIME = 100;
+
+    /** Claw full closed time (ms) */
+    public static int CLAW_FULL_CLOSED_TIME = 250;
+
+    /** Wait time before allowing 'A' button transition in MOVE_INTAKE_WRIST (ms) */
     public static int MOVE_INTAKE_WRIST_A_BUTTON_WAIT_MS = 200;
+
+    // ========== WRIST POSITIONS ==========
+
+    /** Wrist basket position */
+    public static double WRIST_BASKET = 0.65;
+
+    /** Wrist get specimen position */
+    public static double WRIST_GET_SPECIMEN = 0.35;
+
+    /** Wrist grab position */
+    public static double WRIST_GRAB = 0.54;
+
+    /** Wrist initialization position */
+    public static double WRIST_INIT = 0.475;
+
+    /** Wrist rest position */
+    public static double WRIST_REST = 0.7;
+
+    /** Wrist score specimen position */
+    public static double WRIST_SCORE_SPECIMEN = 0.62;
+
+    /** Wrist transition position */
+    public static double WRIST_TRANSITION = 0.2;
+
+    /** Wrist tuck position */
+    public static double WRIST_TUCK = 0.9;
 }

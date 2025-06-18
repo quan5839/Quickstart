@@ -19,7 +19,7 @@ import pedroPathing.constants.FConstants;
 import pedroPathing.constants.IntakeConstants;
 import pedroPathing.constants.LConstants;
 import pedroPathing.constants.OuttakeConstants;
-import pedroPathing.constants.SpecimenAutoConstant;
+import pedroPathing.constants.SpecimenAutoConstants;
 import pedroPathing.hardware.RobotHardware;
 import pedroPathing.robot_state.RobotMode;
 import pedroPathing.robot_state.RobotState;
@@ -81,56 +81,56 @@ public class SpecimenAutoSafe extends OpMode {
      * Lets assume the Robot is facing the human player and we want to score in the bucket */
 
     /** Start Pose of our robot */
-    private final Pose startPose = new Pose(SpecimenAutoConstant.START_X, SpecimenAutoConstant.START_Y, Math.toRadians(SpecimenAutoConstant.START_HEADING_DEG));
+    private final Pose startPose = new Pose(SpecimenAutoConstants.START_X, SpecimenAutoConstants.START_Y, Math.toRadians(SpecimenAutoConstants.START_HEADING_DEG));
 
     /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
-    private final Pose scorePreLoadPose = new Pose(SpecimenAutoConstant.SCORE_X, SpecimenAutoConstant.SCORE_PRELOAD_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose scorePreLoadPose = new Pose(SpecimenAutoConstants.SCORE_X, SpecimenAutoConstants.SCORE_PRELOAD_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
-    private final Pose pushPickup1PrepPose = new Pose(SpecimenAutoConstant.PUSH_PICKUP1_PREP_X, SpecimenAutoConstant.PUSH_PICKUP1_PREP_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose pushPickup1PrepPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP1_PREP_X, SpecimenAutoConstants.PUSH_PICKUP1_PREP_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
-    private final Pose pushPickup1PrepControlPose = new Pose(SpecimenAutoConstant.PUSH_PICKUP1_PREP_CONTROL_X, SpecimenAutoConstant.PUSH_PICKUP1_PREP_CONTROL_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose pushPickup1PrepControlPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP1_PREP_CONTROL_X, SpecimenAutoConstants.PUSH_PICKUP1_PREP_CONTROL_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
     /** Lowest (First) Sample from the Spike Mark */
-    private final Pose pushPickup1Pose = new Pose(SpecimenAutoConstant.PUSH_PICKUP1_X, SpecimenAutoConstant.PUSH_PICKUP1_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose pushPickup1Pose = new Pose(SpecimenAutoConstants.PUSH_PICKUP1_X, SpecimenAutoConstants.PUSH_PICKUP1_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
-    private final Pose pushPickup1ControlPose = new Pose(SpecimenAutoConstant.PUSH_PICKUP1_CONTROL_X, SpecimenAutoConstant.PUSH_PICKUP1_CONTROL_Y);
+    private final Pose pushPickup1ControlPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP1_CONTROL_X, SpecimenAutoConstants.PUSH_PICKUP1_CONTROL_Y);
 
-    private final Pose pushRetrieve1Pose = new Pose(SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP1_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose pushRetrieve1Pose = new Pose(SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP1_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
     /** Middle (Second) Sample from the Spike Mark */
-    private final Pose pushPickup2Pose = new Pose(SpecimenAutoConstant.PUSH_PICKUP2_X, SpecimenAutoConstant.PUSH_PICKUP2_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose pushPickup2Pose = new Pose(SpecimenAutoConstants.PUSH_PICKUP2_X, SpecimenAutoConstants.PUSH_PICKUP2_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
-    private final Pose pushPickup2ControlPose = new Pose(SpecimenAutoConstant.PUSH_PICKUP2_CONTROL_X, SpecimenAutoConstant.PUSH_PICKUP2_CONTROL_Y);
+    private final Pose pushPickup2ControlPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP2_CONTROL_X, SpecimenAutoConstants.PUSH_PICKUP2_CONTROL_Y);
 
-    private final Pose retrieve2Pose = new Pose(SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP2_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose retrieve2Pose = new Pose(SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP2_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
 
     /** Highest (Third) Sample from the Spike Mark */
-    private final Pose pushPickup3Pose = new Pose(SpecimenAutoConstant.PUSH_PICKUP3_X, SpecimenAutoConstant.PUSH_PICKUP3_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose pushPickup3Pose = new Pose(SpecimenAutoConstants.PUSH_PICKUP3_X, SpecimenAutoConstants.PUSH_PICKUP3_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
-    private final Pose pushPickup3ControlPose = new Pose(SpecimenAutoConstant.PUSH_PICKUP3_CONTROL_X, SpecimenAutoConstant.PUSH_PICKUP3_CONTROL_Y);
+    private final Pose pushPickup3ControlPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP3_CONTROL_X, SpecimenAutoConstants.PUSH_PICKUP3_CONTROL_Y);
 
-    private final Pose retrieve3Pose = new Pose(SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstant.PUSH_RETRIEVE_PICKUP3_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose retrieve3Pose = new Pose(SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP3_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
-    private final Pose prepGrabSpecimenPose = new Pose(SpecimenAutoConstant.PREP_GRAB_SPECIMEN_X, SpecimenAutoConstant.PREP_AND_GRAB_SPECIMEN_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
-    private final Pose prepGrabSpecimenPoseControl1 = new Pose(SpecimenAutoConstant.PREP_GRAB_SPECIMEN_CONTROL_X_1, SpecimenAutoConstant.PREP_GRAB_SPECIMEN_CONTROL_Y_1);
-    private final Pose prepGrabSpecimenPoseControl2 = new Pose(SpecimenAutoConstant.PREP_GRAB_SPECIMEN_CONTROL_X_2, SpecimenAutoConstant.PREP_GRAB_SPECIMEN_CONTROL_Y_2);
+    private final Pose prepGrabSpecimenPose = new Pose(SpecimenAutoConstants.PREP_GRAB_SPECIMEN_X, SpecimenAutoConstants.PREP_AND_GRAB_SPECIMEN_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
+    private final Pose prepGrabSpecimenPoseControl1 = new Pose(SpecimenAutoConstants.PREP_GRAB_SPECIMEN_CONTROL_X_1, SpecimenAutoConstants.PREP_GRAB_SPECIMEN_CONTROL_Y_1);
+    private final Pose prepGrabSpecimenPoseControl2 = new Pose(SpecimenAutoConstants.PREP_GRAB_SPECIMEN_CONTROL_X_2, SpecimenAutoConstants.PREP_GRAB_SPECIMEN_CONTROL_Y_2);
 
-    private final Pose grabSpecimenPose = new Pose(SpecimenAutoConstant.GRAB_SPECIMEN_X, SpecimenAutoConstant.PREP_AND_GRAB_SPECIMEN_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose grabSpecimenPose = new Pose(SpecimenAutoConstants.GRAB_SPECIMEN_X, SpecimenAutoConstants.PREP_AND_GRAB_SPECIMEN_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
-    private final Pose scoreSpecimen1Pose = new Pose(SpecimenAutoConstant.SCORE_X, SpecimenAutoConstant.SCORE1_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
-    private final Pose scoreSpecimen2Pose = new Pose(SpecimenAutoConstant.SCORE_X, SpecimenAutoConstant.SCORE2_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
-    private final Pose scoreSpecimen3Pose = new Pose(SpecimenAutoConstant.SCORE_X, SpecimenAutoConstant.SCORE3_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
-    private final Pose scoreSpecimenPose = new Pose(SpecimenAutoConstant.SCORE_X, SpecimenAutoConstant.SCORE4_Y, Math.toRadians(SpecimenAutoConstant.GRAB_SCORE_HEADING_DEG));
+    private final Pose scoreSpecimen1Pose = new Pose(SpecimenAutoConstants.SCORE_X, SpecimenAutoConstants.SCORE1_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
+    private final Pose scoreSpecimen2Pose = new Pose(SpecimenAutoConstants.SCORE_X, SpecimenAutoConstants.SCORE2_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
+    private final Pose scoreSpecimen3Pose = new Pose(SpecimenAutoConstants.SCORE_X, SpecimenAutoConstants.SCORE3_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
+    private final Pose scoreSpecimenPose = new Pose(SpecimenAutoConstants.SCORE_X, SpecimenAutoConstants.SCORE4_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 
-    private final Pose scoreSpecimenControlPose = new Pose(SpecimenAutoConstant.SCORE_CONTROL_X, SpecimenAutoConstant.SCORE_CONTROL_Y);
+    private final Pose scoreSpecimenControlPose = new Pose(SpecimenAutoConstants.SCORE_CONTROL_X, SpecimenAutoConstants.SCORE_CONTROL_Y);
 
     /** Park Pose for our robot, after we do all of the scoring. */
-    private final Pose parkPose = new Pose(SpecimenAutoConstant.PARK_X, SpecimenAutoConstant.PARK_Y, Math.toRadians(SpecimenAutoConstant.PARK_HEADING_DEG));
+    private final Pose parkPose = new Pose(SpecimenAutoConstants.PARK_X, SpecimenAutoConstants.PARK_Y, Math.toRadians(SpecimenAutoConstants.PARK_HEADING_DEG));
 
     /** Park Control Pose for our robot, this is used to manipulate the bezier curve that we will create for the parking.
      * The Robot will not go to this pose, it is used a control point for our bezier curve. */
-    private final Pose parkControlPose = new Pose(SpecimenAutoConstant.PARK_CONTROL_X, SpecimenAutoConstant.PARK_CONTROL_Y);
+    private final Pose parkControlPose = new Pose(SpecimenAutoConstants.PARK_CONTROL_X, SpecimenAutoConstants.PARK_CONTROL_Y);
 
     /* These are our Paths and PathChains that we will define in buildPaths() */
     private Path scorePreload, park, returnToStart;
@@ -260,16 +260,16 @@ public class SpecimenAutoSafe extends OpMode {
 
         switch (pathState) {
         case 0:
-            robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_LIFT);
-            robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_SCORE_SPECIMEN);
-            robot.outtake.setOuttakeWristPosition(OuttakeConstants.OUTTAKE_WRIST_SCORE_SPECIMEN);
+            robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_LIFT);
+            robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_SCORE_SPECIMEN);
+            robot.outtake.setWristPosition(OuttakeConstants.WRIST_SCORE_SPECIMEN);
             follower.followPath(scorePreload);
             setPathState(1);
             break;
 
         case 1:
             if(!follower.isBusy()) {
-                robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
+                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
                 stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
                 setPathState(2);
             }
@@ -343,7 +343,7 @@ public class SpecimenAutoSafe extends OpMode {
 
         case 11:
             if (!follower.isBusy()){
-                robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
+                robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
                 if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
                     follower.followPath(scoreSpecimen1);
                     setPathState(12);
@@ -352,7 +352,7 @@ public class SpecimenAutoSafe extends OpMode {
             break;
         case 12:
             if(!follower.isBusy()) {
-                robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
+                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
                 stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
                 setPathState(13);
             }
@@ -372,7 +372,7 @@ public class SpecimenAutoSafe extends OpMode {
 
         case 15:
             if (!follower.isBusy()){
-                robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
+                robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
                 if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
                     follower.followPath(scoreSpecimen2);
                     setPathState(16);
@@ -381,7 +381,7 @@ public class SpecimenAutoSafe extends OpMode {
             break;
         case 16:
             if(!follower.isBusy()) {
-                robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
+                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
                 stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
                 setPathState(17);
             }
@@ -402,7 +402,7 @@ public class SpecimenAutoSafe extends OpMode {
 
         case 19:
             if (!follower.isBusy()){
-                robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
+                robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
                 if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
                     follower.followPath(scoreSpecimen3);
                     setPathState(20);
@@ -411,7 +411,7 @@ public class SpecimenAutoSafe extends OpMode {
             break;
         case 20:
             if(!follower.isBusy()) {
-                robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
+                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
                 stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
                 setPathState(21);
             }
@@ -432,7 +432,7 @@ public class SpecimenAutoSafe extends OpMode {
 
         case 23:
             if (!follower.isBusy()){
-                robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
+                robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
                 if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
                     follower.followPath(scoreSpecimen4);
                     setPathState(24);
@@ -441,7 +441,7 @@ public class SpecimenAutoSafe extends OpMode {
             break;
         case 24:
             if(!follower.isBusy()) {
-                robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE);
+                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
                 stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
                 setPathState(25);
             }
@@ -647,7 +647,7 @@ public class SpecimenAutoSafe extends OpMode {
 
         // Initialize the robot hardware
         robot.init();
-        robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
+        robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
 
         // Initialize the state machine with a dummy gamepad and sample mode for autonomous
         Gamepad dummyGamepad = new Gamepad();

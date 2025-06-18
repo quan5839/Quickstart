@@ -2,7 +2,7 @@ package pedroPathing.hardware;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import pedroPathing.constants.IntakeConstants;
-import pedroPathing.constants.CameraConstants;
+import pedroPathing.constants.VisionConstants;
 
 /**
  * Simple Vision-Guided Intake Positioning
@@ -121,8 +121,8 @@ public class SimpleVisionIntake {
             double ty = visionSystem.getTargetY(); // Vertical angle
             
             // Convert angles to pixel coordinates for distance calculation
-            pixelX = (tx / (CameraConstants.CAMERA_FOV_HORIZONTAL / 2.0)) * (CameraConstants.CAMERA_WIDTH / 2.0) + (CameraConstants.CAMERA_WIDTH / 2.0);
-            pixelY = (-ty / (CameraConstants.CAMERA_FOV_VERTICAL / 2.0)) * (CameraConstants.CAMERA_HEIGHT_PIXELS / 2.0) + (CameraConstants.CAMERA_HEIGHT_PIXELS / 2.0);
+            pixelX = (tx / (VisionConstants.CAMERA_FOV_HORIZONTAL / 2.0)) * (VisionConstants.CAMERA_WIDTH / 2.0) + (VisionConstants.CAMERA_WIDTH / 2.0);
+            pixelY = (-ty / (VisionConstants.CAMERA_FOV_VERTICAL / 2.0)) * (VisionConstants.CAMERA_HEIGHT_PIXELS / 2.0) + (VisionConstants.CAMERA_HEIGHT_PIXELS / 2.0);
             
             // Calculate distance using camera geometry
             double distance = calculateDistance(pixelX, pixelY);
@@ -133,8 +133,8 @@ public class SimpleVisionIntake {
             double robotRelativeY = distance * Math.sin(Math.toRadians(horizontalAngle));
             
             // Adjust for camera offset
-            robotRelativeX += CameraConstants.CAMERA_OFFSET_X;
-            robotRelativeY += CameraConstants.CAMERA_OFFSET_Y;
+            robotRelativeX += VisionConstants.CAMERA_OFFSET_X;
+            robotRelativeY += VisionConstants.CAMERA_OFFSET_Y;
             
             return new double[]{robotRelativeX, robotRelativeY};
             
@@ -150,22 +150,22 @@ public class SimpleVisionIntake {
     private double calculateDistance(double pixelX, double pixelY) {
         try {
             // Calculate vertical angle
-            double normalizedY = (pixelY - (CameraConstants.CAMERA_HEIGHT_PIXELS / 2.0)) / (CameraConstants.CAMERA_HEIGHT_PIXELS / 2.0);
-            double verticalAngle = -normalizedY * (CameraConstants.CAMERA_FOV_VERTICAL / 2.0);
-            
+            double normalizedY = (pixelY - (VisionConstants.CAMERA_HEIGHT_PIXELS / 2.0)) / (VisionConstants.CAMERA_HEIGHT_PIXELS / 2.0);
+            double verticalAngle = -normalizedY * (VisionConstants.CAMERA_FOV_VERTICAL / 2.0);
+
             // Adjust for camera tilt
-            double effectiveAngle = Math.toRadians(verticalAngle + CameraConstants.CAMERA_TILT_ANGLE);
+            double effectiveAngle = Math.toRadians(verticalAngle + VisionConstants.CAMERA_TILT_ANGLE);
             
             // Calculate distance using trigonometry
             if (Math.abs(effectiveAngle) > 0.01) {
-                double distance = (CameraConstants.CAMERA_HEIGHT - CameraConstants.SAMPLE_HEIGHT) / Math.tan(Math.abs(effectiveAngle));
-                return Math.max(CameraConstants.MIN_DETECTION_DISTANCE, 
-                       Math.min(distance, CameraConstants.MAX_DETECTION_DISTANCE));
+                double distance = (VisionConstants.CAMERA_HEIGHT - VisionConstants.SAMPLE_HEIGHT) / Math.tan(Math.abs(effectiveAngle));
+                return Math.max(VisionConstants.MIN_DETECTION_DISTANCE,
+                       Math.min(distance, VisionConstants.MAX_DETECTION_DISTANCE));
             } else {
-                return CameraConstants.DEFAULT_DISTANCE;
+                return VisionConstants.DEFAULT_DISTANCE;
             }
         } catch (Exception e) {
-            return CameraConstants.DEFAULT_DISTANCE;
+            return VisionConstants.DEFAULT_DISTANCE;
         }
     }
     

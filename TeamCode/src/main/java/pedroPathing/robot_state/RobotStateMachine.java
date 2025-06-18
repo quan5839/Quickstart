@@ -151,8 +151,8 @@ public class RobotStateMachine {
                                 0,
                                 null,
                                 () -> {
-                                    robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_REST);
-                                    robot.outtake.setOuttakeWristPosition(OuttakeConstants.OUTTAKE_ELBOW_REST);
+                                    robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_REST);
+                                    robot.outtake.setWristPosition(OuttakeConstants.ELBOW_REST);
                                     robot.intake.setIntakeClawPosition(IntakeConstants.CLAW_OPEN);
                                     robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_REST);
                                     robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_REST);
@@ -341,8 +341,8 @@ public class RobotStateMachine {
                                     robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_OUTTAKE_TRANSITION);
                                     robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_OUTTAKE_TRANSITION_PREP);
 
-                                    robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_TRANSITION);
-                                    robot.outtake.setOuttakeWristPosition(OuttakeConstants.OUTTAKE_WRIST_TRANSITION);
+                                    robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_TRANSITION);
+                                    robot.outtake.setWristPosition(OuttakeConstants.WRIST_TRANSITION);
                                 },
                                 RobotState.SAMPLE_INTAKE_RELEASE_ELBOWS
                         )
@@ -380,10 +380,10 @@ public class RobotStateMachine {
                 Collections.singletonList(
                         new StateTransition(
                                 RobotState.SAMPLE_INTAKE_SLIDES_CONTRACT,
-                                OuttakeConstants.OUTTAKE_CLAW_CLOSED_TIME,
+                                OuttakeConstants.CLAW_CLOSED_TIME,
                                 null,
                                 () -> {
-                                    robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
+                                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
                                     robot.intake.setIntakeClawPosition(IntakeConstants.CLAW_OPEN);
                                 },
                                 RobotState.SAMPLE_INTAKE_CLAW_OPEN
@@ -395,7 +395,7 @@ public class RobotStateMachine {
                 Collections.singletonList(
                         new StateTransition(
                                 RobotState.SAMPLE_INTAKE_CLAW_OPEN,
-                                OuttakeConstants.OUTTAKE_CLAW_CLOSED_TIME,
+                                OuttakeConstants.CLAW_CLOSED_TIME,
                                 null,
                                 () -> {
                                     isIntaking = false;
@@ -403,9 +403,9 @@ public class RobotStateMachine {
                                     robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_REST);
                                     robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_REST);
 
-                                    robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_REST);
-                                    robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_REST);
-                                    robot.outtake.setOuttakeWristPosition(OuttakeConstants.OUTTAKE_WRIST_REST);
+                                    robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_REST);
+                                    robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_REST);
+                                    robot.outtake.setWristPosition(OuttakeConstants.WRIST_REST);
 
                                     // Schedule the slide to move to SLIDE_MIN after SLIDE_RELEASE_TIME
                                     scheduleIntakeSlideReset(IntakeConstants.SLIDE_RELEASE_TIME);
@@ -426,7 +426,7 @@ public class RobotStateMachine {
                                 0,
                                 () -> buttonDetector.leftBumperPressed(gamepad),
                                 () -> {
-                                    robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_BASKET);
+                                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_BASKET);
                                     robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_HOLD);
                                     isIntaking = true;
                                 },
@@ -437,7 +437,7 @@ public class RobotStateMachine {
                                 0,
                                 () -> buttonDetector.rightBumperPressed(gamepad),
                                 () -> {
-                                    robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_OPEN);
+                                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
                                     robot.intake.setIntakeClawPosition(IntakeConstants.CLAW_OPEN);
                                     robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
                                     robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
@@ -452,11 +452,11 @@ public class RobotStateMachine {
                 Collections.singletonList(
                         new StateTransition(
                                 RobotState.SAMPLE_OUTTAKE_SLIDES_EXTEND,
-                                OuttakeConstants.OUTTAKE_SLIDE_ELBOW_PREP,
+                                OuttakeConstants.SLIDE_ELBOW_PREP,
                                 null,
                                 () -> {
-                                    robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_BASKET);
-                                    robot.outtake.setOuttakeWristPosition(OuttakeConstants.OUTTAKE_WRIST_BASKET);
+                                    robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_BASKET);
+                                    robot.outtake.setWristPosition(OuttakeConstants.WRIST_BASKET);
                                 },
                                 RobotState.SAMPLE_OUTTAKE_ELBOW_BASKET
                         )
@@ -470,7 +470,7 @@ public class RobotStateMachine {
                                 500,
                                 () -> buttonDetector.leftBumperPressed(gamepad),
                                 () -> {
-                                    robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_OPEN);
+                                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
                                     isIntaking = false;
                                 },
                                 RobotState.SAMPLE_OUTTAKE_DUMP
@@ -485,9 +485,9 @@ public class RobotStateMachine {
                                 200,
                                 null,
                                 () -> {
-                                    robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_MIN);
-                                    robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_REST);
-                                    robot.outtake.setOuttakeWristPosition(OuttakeConstants.OUTTAKE_ELBOW_REST);
+                                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
+                                    robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_REST);
+                                    robot.outtake.setWristPosition(OuttakeConstants.ELBOW_REST);
                                     outtakeResetDone = false;
                                     scheduleOuttakeReset(ControlConstants.OUTTAKE_RESET_DELAY_LONG_MS);
                                 },
@@ -568,9 +568,9 @@ public class RobotStateMachine {
                                 0,
                                 null,
                                 () -> {
-                                    robot.outtake.openOuttakeClaw();
-                                    robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_GET_SPECIMEN);
-                                    robot.outtake.setOuttakeWristPosition(OuttakeConstants.OUTTAKE_WRIST_GET_SPECIMEN);
+                                    robot.outtake.openClaw();
+                                    robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_GET_SPECIMEN);
+                                    robot.outtake.setWristPosition(OuttakeConstants.WRIST_GET_SPECIMEN);
                                 },
                                 RobotState.SPECIMEN_OUTTAKE_CLAW_CLOSE
                         )
@@ -589,7 +589,7 @@ public class RobotStateMachine {
                                            (ControlConstants.ENABLE_AUTO_SPECIMEN_OUTTAKE_ADVANCE && specimenResult.hasValidSpecimen())) && outtakeResetDone;
                                 },
                                 () -> {
-                                    robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_CLOSED);
+                                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
                                 },
                                 RobotState.SPECIMEN_OUTTAKE_PREPARE
                         )
@@ -601,12 +601,12 @@ public class RobotStateMachine {
                 Collections.singletonList(
                         new StateTransition(
                                 RobotState.SPECIMEN_OUTTAKE_PREPARE,
-                                OuttakeConstants.OUTTAKE_CLAW_FULL_CLOSED_TIME,
+                                OuttakeConstants.CLAW_FULL_CLOSED_TIME,
                                 null,
                                 () -> {
-                                    robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_LIFT);
-                                    robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_SCORE_SPECIMEN);
-                                    robot.outtake.setOuttakeWristPosition(OuttakeConstants.OUTTAKE_WRIST_SCORE_SPECIMEN);
+                                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_LIFT);
+                                    robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_SCORE_SPECIMEN);
+                                    robot.outtake.setWristPosition(OuttakeConstants.WRIST_SCORE_SPECIMEN);
                                     },
                                 RobotState.SPECIMEN_OUTTAKE_CHECK
                         )
@@ -619,7 +619,7 @@ public class RobotStateMachine {
                                 RobotState.SPECIMEN_OUTTAKE_CHECK,
                                 400,
                                 () -> buttonDetector.leftBumperPressed(gamepad),
-                                () -> robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_SCORE),
+                                () -> robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE),
                                 RobotState.SPECIMEN_OUTTAKE_RELEASE
                         )
                 )
@@ -631,7 +631,7 @@ public class RobotStateMachine {
                                 RobotState.SPECIMEN_OUTTAKE_RELEASE,
                                 ControlConstants.SPECIMEN_RELEASE_DELAY_MS,
                                 null,
-                                () -> robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_FULLY_OPEN),
+                                () -> robot.outtake.setClawPosition(OuttakeConstants.CLAW_FULLY_OPEN),
                                 RobotState.SPECIMEN_OUTTAKE_SCORE
                         )
                 )
@@ -641,10 +641,10 @@ public class RobotStateMachine {
                 Collections.singletonList(
                         new StateTransition(
                                 RobotState.SPECIMEN_OUTTAKE_SCORE,
-                                OuttakeConstants.OUTTAKE_CLAW_CLOSED_TIME,
+                                OuttakeConstants.CLAW_CLOSED_TIME,
                                 null,
                                 () -> {
-                                    robot.outtake.setOuttakeSlidePosition(OuttakeConstants.OUTTAKE_SLIDE_MIN);
+                                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
                                     outtakeResetDone = false;
                                     scheduleOuttakeReset(ControlConstants.OUTTAKE_RESET_DELAY_MS);
                                 },
@@ -660,9 +660,9 @@ public class RobotStateMachine {
                                 0,
                                 null,
                                 () -> {
-                                    robot.outtake.setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_REST);
-                                    robot.outtake.setOuttakeWristPosition(OuttakeConstants.OUTTAKE_WRIST_TUCK);
-                                    robot.outtake.setOuttakeClawPosition(OuttakeConstants.CLAW_FULLY_OPEN);
+                                    robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_REST);
+                                    robot.outtake.setWristPosition(OuttakeConstants.WRIST_TUCK);
+                                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_FULLY_OPEN);
                                     scheduleOuttakeReset(0);
                                 },
                                 RobotState.HOLD
@@ -1160,7 +1160,7 @@ public class RobotStateMachine {
             boolean timerExpired = outtakeResetTimer.milliseconds() > outtakeResetDelay;
 
             if (limitSwitchTriggered || timerExpired) {
-                robot.outtake.resetOuttakeSlide();
+                robot.outtake.resetSlide();
                 outtakeResetDone = true;
                 scheduleOuttakeReset = false;
             }
@@ -1269,11 +1269,45 @@ public class RobotStateMachine {
 
         // Reset states based on new mode
         if (newMode == RobotMode.SPECIMEN) {
-            changeExternalState(RobotState.INIT);
-            changeState(RobotState.HOLD);
+            switch (currentState){
+                case SAMPLE_OUTTAKE_ELBOW_BASKET:
+                robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
+                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
+                robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_REST);
+                robot.outtake.setWristPosition(OuttakeConstants.ELBOW_REST);
+                outtakeResetDone = false;
+                isIntaking = false;
+                scheduleOuttakeReset(ControlConstants.OUTTAKE_RESET_DELAY_LONG_MS);
+                changeExternalState(RobotState.INIT);
+                changeState(RobotState.HOLD);
+                break;
+
+
+
+                default:
+                    changeExternalState(RobotState.INIT);
+                    changeState(RobotState.HOLD);
+                    isIntaking = false;
+                break;
+            }
+
         } else if (newMode == RobotMode.SAMPLE) {
-            changeExternalState(RobotState.INIT);
-            changeState(RobotState.INIT);
+            switch (currentState) {
+                case SPECIMEN_OUTTAKE_CHECK:
+                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
+                    outtakeResetDone = false;
+                    scheduleOuttakeReset(ControlConstants.OUTTAKE_RESET_DELAY_MS);
+                    changeExternalState(RobotState.INIT);
+                    changeState(RobotState.HOLD);
+
+                    break;
+
+                default:
+                    changeExternalState(RobotState.INIT);
+                    changeState(RobotState.INIT);
+                    break;
+            }
+
         }
 
         if (gamepad != null) gamepad.rumble(ControlConstants.MODE_SWITCH_RUMBLE_DURATION_MS);

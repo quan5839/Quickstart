@@ -11,16 +11,16 @@ import pedroPathing.constants.OuttakeConstants;
 import pedroPathing.util.ColorDetectionUtil;
 
 public class OuttakeSystem {
-    private DcMotorEx outtakeSlideRight;
-    private DcMotorEx outtakeSlideLeft;
-    private Servo outtakeElbowRight;
-    private Servo outtakeElbowLeft;
-    private Servo outtakeWrist;
-    private Servo outtakeClaw;
-    private RevColorSensorV3 outtakeColorSensor;
+    private DcMotorEx slideRight;
+    private DcMotorEx slideLeft;
+    private Servo elbowRight;
+    private Servo elbowLeft;
+    private Servo wrist;
+    private Servo claw;
+    private RevColorSensorV3 colorSensor;
     private ColorDetectionUtil colorDetectionUtil;
     private OpMode myOpMode;
-    private DigitalChannel outtakeSlideLimit;
+    private DigitalChannel slideLimit;
 
     // Track the logical state of the subsystem
     public enum OuttakeState {IDLE, PREPPING, RECEIVING, SCORING, BASKET, COMPLETE}
@@ -48,18 +48,18 @@ public class OuttakeSystem {
     }
 
     public void init() {
-        outtakeElbowRight = safeInitServo("outtakeElbowRight", Servo.Direction.REVERSE, OuttakeConstants.OUTTAKE_ELBOW_INIT);
-        outtakeElbowLeft = safeInitServo("outtakeElbowLeft", Servo.Direction.FORWARD, OuttakeConstants.OUTTAKE_ELBOW_INIT);
-        outtakeWrist = safeInitServo("outtakeWrist", Servo.Direction.FORWARD, OuttakeConstants.OUTTAKE_WRIST_INIT);
-        outtakeClaw = safeInitServo("outtakeClaw", Servo.Direction.FORWARD, OuttakeConstants.CLAW_CLOSED, OuttakeConstants.CLAW_OPEN, OuttakeConstants.CLAW_OPEN);
-        outtakeSlideRight = myOpMode.hardwareMap.get(DcMotorEx.class, "outtakeSlideRight");
-        outtakeSlideLeft = myOpMode.hardwareMap.get(DcMotorEx.class, "outtakeSlideLeft");
-        outtakeSlideRight.setDirection(DcMotor.Direction.FORWARD);
-        outtakeSlideLeft.setDirection(DcMotor.Direction.REVERSE);
+        elbowRight = safeInitServo("outtakeElbowRight", Servo.Direction.REVERSE, OuttakeConstants.ELBOW_INIT);
+        elbowLeft = safeInitServo("outtakeElbowLeft", Servo.Direction.FORWARD, OuttakeConstants.ELBOW_INIT);
+        wrist = safeInitServo("outtakeWrist", Servo.Direction.FORWARD, OuttakeConstants.WRIST_INIT);
+        claw = safeInitServo("outtakeClaw", Servo.Direction.FORWARD, OuttakeConstants.CLAW_CLOSED, OuttakeConstants.CLAW_OPEN, OuttakeConstants.CLAW_OPEN);
+        slideRight = myOpMode.hardwareMap.get(DcMotorEx.class, "outtakeSlideRight");
+        slideLeft = myOpMode.hardwareMap.get(DcMotorEx.class, "outtakeSlideLeft");
+        slideRight.setDirection(DcMotor.Direction.FORWARD);
+        slideLeft.setDirection(DcMotor.Direction.REVERSE);
         try {
-            outtakeColorSensor = myOpMode.hardwareMap.get(RevColorSensorV3.class, "outtakeColorSensor");
-            outtakeColorSensor.enableLed(true);
-            colorDetectionUtil = new ColorDetectionUtil(outtakeColorSensor, "outtakeColorSensor");
+            colorSensor = myOpMode.hardwareMap.get(RevColorSensorV3.class, "outtakeColorSensor");
+            colorSensor.enableLed(true);
+            colorDetectionUtil = new ColorDetectionUtil(colorSensor, "outtakeColorSensor");
         } catch (Exception e) {
             myOpMode.telemetry.addData("ERROR", "outtakeColorSensor not found!");
             colorDetectionUtil = new ColorDetectionUtil(null, "outtake");
@@ -67,135 +67,90 @@ public class OuttakeSystem {
 
         // Initialize outtake slide limit switch
         try {
-            outtakeSlideLimit = myOpMode.hardwareMap.get(DigitalChannel.class, "outtakeSlideLimitSwitch");
-            outtakeSlideLimit.setMode(DigitalChannel.Mode.INPUT);
+            slideLimit = myOpMode.hardwareMap.get(DigitalChannel.class, "outtakeSlideLimitSwitch");
+            slideLimit.setMode(DigitalChannel.Mode.INPUT);
         } catch (Exception e) {
             myOpMode.telemetry.addData("ERROR", "outtakeSlideLimitSwitch not found!");
-            outtakeSlideLimit = null;
+            slideLimit = null;
         }
 
         myOpMode.telemetry.update();
     }
 
-    public void setOuttakeElbowPosition(double position) {
-        if (outtakeElbowLeft != null) outtakeElbowLeft.setPosition(position);
-        if (outtakeElbowRight != null) outtakeElbowRight.setPosition(position);
+    public void setElbowPosition(double position) {
+        if (elbowLeft != null) elbowLeft.setPosition(position);
+        if (elbowRight != null) elbowRight.setPosition(position);
     }
 
-    public void setOuttakeSlidePosition(int position, double power) {
-        outtakeSlideLeft.setTargetPosition(position);
-        outtakeSlideRight.setTargetPosition(position);
-        outtakeSlideLeft.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION);
-        outtakeSlideRight.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION);
-        outtakeSlideLeft.setPower(power);
-        outtakeSlideRight.setPower(power);
+    public void setSlidePosition(int position, double power) {
+        slideLeft.setTargetPosition(position);
+        slideRight.setTargetPosition(position);
+        slideLeft.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION);
+        slideRight.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION);
+        slideLeft.setPower(power);
+        slideRight.setPower(power);
     }
 
-    public void setOuttakeSlidePosition(int position) {
-        outtakeSlideLeft.setTargetPosition(position);
-        outtakeSlideRight.setTargetPosition(position);
-        outtakeSlideLeft.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION);
-        outtakeSlideRight.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION);
-        outtakeSlideLeft.setPower(1);
-        outtakeSlideRight.setPower(1);
+    public void setSlidePosition(int position) {
+        slideLeft.setTargetPosition(position);
+        slideRight.setTargetPosition(position);
+        slideLeft.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION);
+        slideRight.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION);
+        slideLeft.setPower(1);
+        slideRight.setPower(1);
     }
 
-    public void resetOuttakeSlide() {
-        outtakeSlideLeft.setPower(0);
-        outtakeSlideRight.setPower(0);
-        outtakeSlideLeft.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        outtakeSlideRight.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        outtakeSlideLeft.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER);
-        outtakeSlideRight.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER);
+    public void resetSlide() {
+        slideLeft.setPower(0);
+        slideRight.setPower(0);
+        slideLeft.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideRight.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slideLeft.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER);
+        slideRight.setMode(com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public void setOuttakeClawPosition(double position) {
-        if (outtakeClaw != null) outtakeClaw.setPosition(position);
+    public void setClawPosition(double position) {
+        if (claw != null) claw.setPosition(position);
+    }
+
+    public void setWristPosition(double position) {
+        if (wrist != null) wrist.setPosition(position);
     }
 
     public double getOuttakeClawPosition() {
-        return outtakeClaw != null ? outtakeClaw.getPosition() : 0;
+        return claw != null ? claw.getPosition() : 0;
     }
 
-    public void openOuttakeClaw() {
-        if (outtakeClaw != null) outtakeClaw.setPosition(OuttakeConstants.CLAW_OPEN);
+    public void openClaw() {
+        if (claw != null) claw.setPosition(OuttakeConstants.CLAW_OPEN);
     }
 
-    public void closeOuttakeClaw() {
-        if (outtakeClaw != null) outtakeClaw.setPosition(OuttakeConstants.CLAW_CLOSED);
+    public void openFullyClaw(){
+        if (claw != null) claw.setPosition(OuttakeConstants.CLAW_FULLY_OPEN);
     }
 
-    public void setOuttakeWristPosition(double position) {
-        if (outtakeWrist != null) outtakeWrist.setPosition(position);
+    public void closeClaw() {
+        if (claw != null) claw.setPosition(OuttakeConstants.CLAW_CLOSED);
     }
 
-    public double getOuttakeWristPosition() {
-        return outtakeWrist != null ? outtakeWrist.getPosition() : 0;
-    }
 
-    public void setOuttakeWristGrab() {
-        if (outtakeWrist != null) outtakeWrist.setPosition(OuttakeConstants.OUTTAKE_WRIST_GRAB);
-    }
 
-    public void setOuttakeWristBasket() {
-        if (outtakeWrist != null) outtakeWrist.setPosition(OuttakeConstants.OUTTAKE_WRIST_BASKET);
-    }
+    public DcMotorEx getSlideLeft() { return slideLeft; }
 
-    public void setOuttakeWristTuck() {
-        if (outtakeWrist != null) outtakeWrist.setPosition(OuttakeConstants.OUTTAKE_WRIST_TUCK);
-    }
+    public DcMotorEx getSlideRight() { return slideRight; }
 
-    public void setOuttakeWristGetSpecimen() {
-        if (outtakeWrist != null)
-            outtakeWrist.setPosition(OuttakeConstants.OUTTAKE_WRIST_GET_SPECIMEN);
-    }
+    public Servo getElbowLeft() { return elbowLeft; }
 
-    public void setOuttakeWristScoreSpecimen() {
-        if (outtakeWrist != null)
-            outtakeWrist.setPosition(OuttakeConstants.OUTTAKE_WRIST_SCORE_SPECIMEN);
-    }
+    public Servo getElbowRight() { return elbowRight; }
 
-    public DcMotorEx getOuttakeSlideLeft() { return outtakeSlideLeft; }
+    public Servo getWrist() { return wrist; }
 
-    public DcMotorEx getOuttakeSlideRight() { return outtakeSlideRight; }
-
-    public Servo getOuttakeElbowLeft() { return outtakeElbowLeft; }
-
-    public Servo getOuttakeElbowRight() { return outtakeElbowRight; }
-
-    public Servo getOuttakeWrist() { return outtakeWrist; }
-
-    public Servo getOuttakeClaw() { return outtakeClaw; }
+    public Servo getClaw() { return claw; }
 
     public OuttakeState getState() {
         return currentState;
     }
 
-    public void prepareOuttakeForReceive() {
-        currentState = OuttakeState.PREPPING;
-        setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_BASE);
-        setOuttakeWristGrab();
-        openOuttakeClaw();
-        currentState = OuttakeState.RECEIVING;
-    }
-
-    public void prepareOuttakeForScoring() {
-        currentState = OuttakeState.PREPPING;
-        setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_SCORE_SPECIMEN);
-        setOuttakeWristScoreSpecimen();
-        currentState = OuttakeState.SCORING;
-    }
-
-    public void prepareOuttakeForBasket() {
-        currentState = OuttakeState.PREPPING;
-        setOuttakeElbowPosition(OuttakeConstants.OUTTAKE_ELBOW_BASKET);
-        setOuttakeWristBasket();
-        currentState = OuttakeState.BASKET;
-    }
-
-    public void completeOuttake() {
-        currentState = OuttakeState.COMPLETE;
-    }
 
     public boolean isSampleDetected(double position) {
         return colorDetectionUtil.isSampleDetected();
@@ -234,8 +189,8 @@ public class OuttakeSystem {
      * @return true if the limit switch is pressed (slide at minimum position), false otherwise
      */
     public boolean isSlideAtMinPosition() {
-        if (outtakeSlideLimit == null) return false;
+        if (slideLimit == null) return false;
         // Limit switch is "active low" - returns false when pressed
-        return !outtakeSlideLimit.getState();
+        return !slideLimit.getState();
     }
 }
