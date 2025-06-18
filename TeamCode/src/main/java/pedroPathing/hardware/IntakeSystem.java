@@ -126,6 +126,23 @@ public class IntakeSystem {
         return currentPosition >= IntakeConstants.SLIDE_HOLD;
     }
 
+    /**
+     * Check if the intake slide has reached the minimum position using the mechanical limit switch
+     * Also returns true if slide is already at minimum position or more retracted
+     * @return true if the limit switch is pressed (slide at min position) or slide is more retracted, false otherwise
+     */
+    public boolean isSlideAtMinPosition() {
+        if (slideLimit != null) {
+            boolean limitSwitchPressed = !slideLimit.getState();
+            if (limitSwitchPressed) {
+                return true;
+            }
+        }
+
+        double currentPosition = getIntakeSlidePosition();
+        return currentPosition >= IntakeConstants.SLIDE_MIN;
+    }
+
     public double getIntakeElbowPosition() {
         return elbow.getPosition();
     }
@@ -172,6 +189,62 @@ public class IntakeSystem {
         }
         if (slideRight != null) {
             slideRight.setPosition(position);
+        }
+    }
+
+    /**
+     * Smart intake slide positioning that automatically returns to minimum position
+     * after reaching hold position via timer or limit switch
+     * @param position Target position for the slide
+     * @param enableAutoReturn Whether to enable automatic return to minimum position
+     */
+    public void setIntakeSlidePositionSmart(double position, boolean enableAutoReturn) {
+        setIntakeSlidePosition(position);
+
+        // If moving to hold position and auto-return is enabled, schedule the auto-return
+        if (enableAutoReturn && Math.abs(position - IntakeConstants.SLIDE_HOLD) < 0.01) {
+            // This will be handled by the state machine's intake slide reset system
+            // The state machine will check both timer and limit switch
+            if (opMode instanceof pedroPathing.BaseTeleop25152) {
+                pedroPathing.BaseTeleop25152 teleop = (pedroPathing.BaseTeleop25152) opMode;
+                if (teleop.getStateMachine() != null) {
+                    teleop.getStateMachine().scheduleIntakeSlideAutoReturn(IntakeConstants.SLIDE_AUTO_RETURN_DELAY);
+                }
+            }
+        }
+    }
+
+    /**
+     * Smart intake slide positioning with auto-return enabled by default
+     * @param position Target position for the slide
+     */
+    public void setIntakeSlidePositionSmart(double position) {
+        setIntakeSlidePositionSmart(position, true);
+    }
+
+    /**
+     * Enhanced slide positioning that automatically returns to minimum position
+     * This method can be used as a drop-in replacement for setIntakeSlidePosition
+     * @param position Target position for the slide
+     */
+    public void setIntakeSlidePositionWithAutoReturn(double position) {
+        setIntakeSlidePosition(position);
+
+        // If moving to hold position, schedule auto-return after delay
+        if (Math.abs(position - IntakeConstants.SLIDE_HOLD) < 0.01) {
+            // Use a simple timer-based approach for autonomous or when state machine is not available
+            new Thread(() -> {
+                try {
+                    Thread.sleep(IntakeConstants.SLIDE_AUTO_RETURN_DELAY);
+                    // Check if we should still auto-return (slide hasn't moved significantly)
+                    double currentPos = getIntakeSlidePosition();
+                    if (Math.abs(currentPos - IntakeConstants.SLIDE_HOLD) < 0.1) {
+                        setIntakeSlidePosition(IntakeConstants.SLIDE_MIN);
+                    }
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }).start();
         }
     }
 

@@ -17,12 +17,13 @@ public class IntakeConstants {
     /** Height of shoulder joint above ground when robot is level (inches) - MEASURE THIS */
     public static double SHOULDER_HEIGHT_INCHES = 8.0;
     
-    /** Length from shoulder joint to elbow joint (inches) */
-    public static double SHOULDER_TO_ELBOW_LENGTH_INCHES = SHOULDER_TO_ELBOW_LENGTH_MM / 25.4;
-    
+
     /** Length from shoulder joint to elbow joint (mm) */
     public static double SHOULDER_TO_ELBOW_LENGTH_MM = 172.353;
-    
+
+    /** Length from shoulder joint to elbow joint (inches) */
+    public static double SHOULDER_TO_ELBOW_LENGTH_INCHES = SHOULDER_TO_ELBOW_LENGTH_MM / 25.4;
+
     /** Total arm reach from shoulder pivot to claw tip (inches) */
     public static double TOTAL_ARM_REACH_INCHES = SHOULDER_TO_ELBOW_LENGTH_INCHES + ELBOW_TO_CLAW_LENGTH_INCHES;
 
@@ -127,7 +128,7 @@ public class IntakeConstants {
     public static double SLIDE_HOLD = 1;
     
     /** Slide maximum position */
-    public static double SLIDE_MAX = 0;
+    public static double SLIDE_MAX = 0.1;
     
     /** Slide maximum extension position */
     public static double SLIDE_MAX_EXTENSION = 0.26;
@@ -136,7 +137,7 @@ public class IntakeConstants {
     public static double SLIDE_MAX_OVERRIDE = 0;
     
     /** Slide minimum position */
-    public static double SLIDE_MIN = 0.88;
+    public static double SLIDE_MIN = 0.8;
     
     /** Slide release position */
     public static double SLIDE_RELEASE = 0.32;
@@ -166,6 +167,9 @@ public class IntakeConstants {
     
     /** Slide release time (ms) */
     public static int SLIDE_RELEASE_TIME = 150;
+
+    /** Auto-return delay from hold to min position (ms) */
+    public static int SLIDE_AUTO_RETURN_DELAY = 800;
 
     // ========== TURRET POSITIONS ==========
     

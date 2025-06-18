@@ -18,8 +18,8 @@ public class OuttakeSystem {
     private Servo wrist;
     private Servo claw;
     private RevColorSensorV3 colorSensor;
-    private ColorDetectionUtil colorDetectionUtil;
-    private OpMode myOpMode;
+    private ColorDetectionUtil colorUtil;
+    private OpMode opMode;
     private DigitalChannel slideLimit;
 
     // Track the logical state of the subsystem
@@ -28,7 +28,7 @@ public class OuttakeSystem {
     private OuttakeState currentState = OuttakeState.IDLE;
 
     public OuttakeSystem(OpMode opMode) {
-        this.myOpMode = opMode;
+        this.opMode = opMode;
     }
 
     private Servo safeInitServo(String name, Servo.Direction direction, Double servoMin, Double servoMax, Double position) {

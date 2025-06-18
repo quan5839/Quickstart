@@ -1174,12 +1174,27 @@ public class RobotStateMachine {
         intakeSlideResetDone = false;
     }
 
+    /**
+     * Public method to schedule intake slide auto-return from external classes
+     * @param delayMs Delay in milliseconds before auto-return to minimum position
+     */
+    public void scheduleIntakeSlideAutoReturn(long delayMs) {
+        scheduleIntakeSlideReset(delayMs);
+    }
+
     private void handleIntakeSlideResetIfNeeded() {
-        if (scheduleIntakeSlideReset && intakeSlideResetTimer.milliseconds() > intakeSlideResetDelay) {
-            isIntaking = false;
-            robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MIN);
-            intakeSlideResetDone = true;
-            scheduleIntakeSlideReset = false;
+        if (scheduleIntakeSlideReset) {
+            // Check if slide has reached minimum position via limit switch (faster reset)
+            // or if timer has expired (fallback for safety)
+            boolean limitSwitchTriggered = robot.intake.isSlideAtMinPosition();
+            boolean timerExpired = intakeSlideResetTimer.milliseconds() > intakeSlideResetDelay;
+
+            if (limitSwitchTriggered || timerExpired) {
+                isIntaking = false;
+                robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MIN);
+                intakeSlideResetDone = true;
+                scheduleIntakeSlideReset = false;
+            }
         }
     }
 
@@ -1405,7 +1420,8 @@ public class RobotStateMachine {
     private void handleSlideControls() {
         if (buttonDetector.dpadDownPressed(gamepad)) {
             if (currentState != RobotState.SAMPLE_INTAKE_CLOSE && currentState != RobotState.SAMPLE_INTAKE_CLAW_CLOSE && currentState != RobotState.SAMPLE_INTAKE_GRAB) {
-                robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_HOLD);
+                // Use smart positioning that will auto-return to min position
+                robot.intake.setIntakeSlidePositionSmart(IntakeConstants.SLIDE_HOLD, true);
                 handleSlidePositionStateTransitions(true); // true = retracting
             }
         }
