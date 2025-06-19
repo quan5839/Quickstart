@@ -277,6 +277,8 @@ public class SpecimenAutoSafe extends OpMode {
             break;
         case 2:
             if(stateMachine.getCurrentState() == RobotState.INIT) {
+                // Reset outtake slide to minimum position after specimen release
+                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
                 stateMachine.changeState(RobotState.HOLD);
                 follower.followPath(pushPickup1Prep, true);
                 setPathState(3);
@@ -300,7 +302,7 @@ public class SpecimenAutoSafe extends OpMode {
         case 5:
             if (!follower.isBusy()){
                 // Move to push sample 2
-                follower.followPath(pushPickup2);
+                follower.followPath(pushPickup2, false);
                 setPathState(6);
             }
             break;
@@ -315,7 +317,7 @@ public class SpecimenAutoSafe extends OpMode {
         case 7:
             if (!follower.isBusy()){
                 // Move to push sample 3
-                follower.followPath(pushPickup3);
+                follower.followPath(pushPickup3, false);
                 setPathState(8);
             }
             break;

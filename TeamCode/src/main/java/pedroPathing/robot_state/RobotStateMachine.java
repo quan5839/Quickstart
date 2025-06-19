@@ -1440,14 +1440,15 @@ public class RobotStateMachine {
     private void handleSlideControls() {
         if (buttonDetector.dpadDownPressed(gamepad)) {
             if (currentState != RobotState.SAMPLE_INTAKE_CLOSE && currentState != RobotState.SAMPLE_INTAKE_CLAW_CLOSE && currentState != RobotState.SAMPLE_INTAKE_GRAB) {
-                // Use auto-return positioning that will automatically return to min position
                 robot.intake.setIntakeSlidePositionWithAutoReturn(IntakeConstants.SLIDE_HOLD);
+                robot.intake.setIntakeTurretPosition(IntakeConstants.TURRET_MIDDLE);
                 handleSlidePositionStateTransitions(true); // true = retracting
             }
         }
 
         if (buttonDetector.dpadUpPressed(gamepad)) {
             robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
+            robot.intake.setIntakeTurretPosition(IntakeConstants.TURRET_MIDDLE);
             handleSlidePositionStateTransitions(false); // false = extending
         }
     }

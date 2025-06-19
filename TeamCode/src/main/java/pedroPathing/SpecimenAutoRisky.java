@@ -267,6 +267,8 @@ public class SpecimenAutoRisky extends OpMode {
             break;
         case 2:
             if(stateMachine.getCurrentState() == RobotState.INIT) {
+                // Reset outtake slide to minimum position after specimen release
+                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
                 stateMachine.changeState(RobotState.HOLD);
                 follower.followPath(grabPickup1, true);
                 setPathState(3);
