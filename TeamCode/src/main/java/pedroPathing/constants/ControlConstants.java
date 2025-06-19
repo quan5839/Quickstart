@@ -219,7 +219,7 @@ public class ControlConstants {
     public static final int SAMPLE_AUTO_DUMP_DELAY_MS = 500;
 
     /** Delay for specimen release action (ms) */
-    public static final int SPECIMEN_RELEASE_DELAY_MS = 500;
+    public static final int SPECIMEN_RELEASE_DELAY_MS = 400;
 
     /** Enable debug mode for state machine stepping */
     public static boolean STATE_MACHINE_DEBUG_MODE = false;

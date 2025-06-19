@@ -36,10 +36,10 @@ public class VisionConstants {
     public static final int CAMERA_HEIGHT_PIXELS = 240;
 
     /** Camera offset from robot center - forward/backward direction (inches) */
-    public static double CAMERA_OFFSET_X = 9.84;
+    public static double CAMERA_OFFSET_X = 2;
 
     /** Camera offset from robot center - left/right direction (inches) */
-    public static double CAMERA_OFFSET_Y = 5.91;
+    public static double CAMERA_OFFSET_Y = 3.5;
 
     /** Limelight 3A red balance */
     public static final int CAMERA_RED_BALANCE = 1802;
@@ -90,8 +90,6 @@ public class VisionConstants {
     public static final double SAMPLE_WIDTH = 1.5;
     // ========== INTAKE CONSTRAINTS ==========
 
-    /** Tolerance for boundary line detection (inches) */
-    public static final double BOUNDARY_TOLERANCE_INCHES = 1.0;
 
     /** Enable inside area reach detection */
     public static boolean ENABLE_INSIDE_AREA_REACH = true;
@@ -103,10 +101,10 @@ public class VisionConstants {
     public static final double INTAKE_BASE_OFFSET_Y = 0.0;
 
     /** Shoulder/arm reach radius (cm) */
-    public static final double INTAKE_SHOULDER_REACH_CM = 17.0;
+    public static final double INTAKE_SHOULDER_REACH_IN = 3.94;
 
     /** Maximum slide extension (cm) */
-    public static final double INTAKE_SLIDE_MAX_EXTENSION_CM = 40.0;
+    public static final double INTAKE_SLIDE_MAX_EXTENSION_IN = 15.75;
 
     /** Turret rotation range (degrees) */
     public static final double INTAKE_TURRET_ROTATION_RANGE = 270.0;

@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import pedroPathing.constants.ControlConstants;
@@ -113,6 +114,11 @@ public class RobotHardware {
         Double prev = positionCache.get(servo);
         double posChange = newPos - (prev != null ? prev : currentPos);
         positionCache.put(servo, newPos);
+
+        // Add telemetry if provided
+        if (telemetry != null) {
+            telemetry.addData("Position", String.format(Locale.US, "%.3f",newPos));
+        }
 
         return newPos;
     }

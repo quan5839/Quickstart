@@ -39,7 +39,7 @@ public class OuttakeConstants {
     public static double ELBOW_REST = 0.3;
 
     /** Elbow score specimen position */
-    public static double ELBOW_SCORE_SPECIMEN = 0.19;
+    public static double ELBOW_SCORE_SPECIMEN = 0.17;
 
     /** Elbow transition position */
     public static double ELBOW_TRANSITION = 0.27;
@@ -68,9 +68,8 @@ public class OuttakeConstants {
 
     /** Slide elbow prep position */
     public static int SLIDE_ELBOW_PREP = 1000;
-
     /** Slide lift position */
-    public static int SLIDE_LIFT = 650;
+    public static int SLIDE_LIFT = 700;
 
     /** Maximum safe extension */
     public static int SLIDE_MAX = 2150;
@@ -110,7 +109,7 @@ public class OuttakeConstants {
     public static double WRIST_REST = 0.7;
 
     /** Wrist score specimen position */
-    public static double WRIST_SCORE_SPECIMEN = 0.62;
+    public static double WRIST_SCORE_SPECIMEN = 0.55;
 
     /** Wrist transition position */
     public static double WRIST_TRANSITION = 0.2;

@@ -1289,57 +1289,61 @@ public class RobotStateMachine {
         }
 
         // Prevent mode change during timer-based states (sensitive timing)
-        if (isInTimerBasedState()) {
-            String blockingState = getBlockingStateInfo();
-            telemetry.addData("Mode Switch Blocked", "Timer-based state: " + blockingState);
-            return;
-        }
+//        if (isInTimerBasedState()) {
+//            String blockingState = getBlockingStateInfo();
+//            telemetry.addData("Mode Switch Blocked", "Timer-based state: " + blockingState);
+//            return;
+//        }
 
         currentMode = newMode;
         RobotLog.dd("RobotStateMachine", "Mode: %s", newMode);
 
-        // Reset states based on new mode
-        if (newMode == RobotMode.SPECIMEN) {
-            switch (currentState){
-                case SAMPLE_OUTTAKE_ELBOW_BASKET:
-                robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
-                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
-                robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_REST);
-                robot.outtake.setWristPosition(OuttakeConstants.ELBOW_REST);
-                outtakeResetDone = false;
-                isIntaking = false;
-                scheduleOuttakeReset(ControlConstants.OUTTAKE_RESET_DELAY_LONG_MS);
-                changeExternalState(RobotState.INIT);
-                changeState(RobotState.HOLD);
-                break;
+//        // Reset states based on new mode
+//        if (newMode == RobotMode.SPECIMEN) {
+//            switch (currentState){
+//                case SAMPLE_OUTTAKE_ELBOW_BASKET:
+//                robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
+//                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
+//                robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_REST);
+//                robot.outtake.setWristPosition(OuttakeConstants.ELBOW_REST);
+//                outtakeResetDone = false;
+//                isIntaking = false;
+//                scheduleOuttakeReset(ControlConstants.OUTTAKE_RESET_DELAY_LONG_MS);
+//                changeExternalState(RobotState.INIT);
+//                changeState(RobotState.HOLD);
+//                break;
+//
+//
+//
+//                default:
+//                    changeExternalState(RobotState.INIT);
+//                    changeState(RobotState.HOLD);
+//                    isIntaking = false;
+//                break;
+//            }
+//
+//        } else if (newMode == RobotMode.SAMPLE) {
+//            switch (currentState) {
+//                case SPECIMEN_OUTTAKE_CHECK:
+//                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
+//                    outtakeResetDone = false;
+//                    scheduleOuttakeReset(ControlConstants.OUTTAKE_RESET_DELAY_MS);
+//                    changeExternalState(RobotState.INIT);
+//                    changeState(RobotState.HOLD);
+//
+//                    break;
+//
+//                default:
+//                    changeExternalState(RobotState.INIT);
+//                    changeState(RobotState.INIT);
+//                    break;
+//            }
+//
+//        }
 
-
-
-                default:
-                    changeExternalState(RobotState.INIT);
-                    changeState(RobotState.HOLD);
-                    isIntaking = false;
-                break;
-            }
-
-        } else if (newMode == RobotMode.SAMPLE) {
-            switch (currentState) {
-                case SPECIMEN_OUTTAKE_CHECK:
-                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
-                    outtakeResetDone = false;
-                    scheduleOuttakeReset(ControlConstants.OUTTAKE_RESET_DELAY_MS);
-                    changeExternalState(RobotState.INIT);
-                    changeState(RobotState.HOLD);
-
-                    break;
-
-                default:
-                    changeExternalState(RobotState.INIT);
-                    changeState(RobotState.INIT);
-                    break;
-            }
-
-        }
+        changeExternalState(RobotState.INIT);
+        changeState(RobotState.HOLD);
+        isIntaking = false;
 
         if (gamepad != null) gamepad.rumble(ControlConstants.MODE_SWITCH_RUMBLE_DURATION_MS);
     }

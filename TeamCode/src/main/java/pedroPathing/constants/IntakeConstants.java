@@ -12,18 +12,13 @@ public class IntakeConstants {
     // ========== ARM KINEMATICS ==========
 
 
-
-    /** Length from shoulder joint to elbow joint (mm) */
-    public static double SHOULDER_TO_ELBOW_LENGTH_MM = 172.353;
-
     /** Length from shoulder joint to elbow joint (inches) */
-    public static double SHOULDER_TO_ELBOW_LENGTH_INCHES = SHOULDER_TO_ELBOW_LENGTH_MM / 25.4;
+    public static double SHOULDER_TO_ELBOW_LENGTH_INCHES = 6.79;
 
-    /** Length from elbow joint to claw tip (inches) - estimated based on typical FTC intake design */
-    public static double ELBOW_TO_CLAW_LENGTH_INCHES = 6.0;
+
 
     /** Total arm reach from shoulder pivot to claw tip (inches) */
-    public static double TOTAL_ARM_REACH_INCHES = SHOULDER_TO_ELBOW_LENGTH_INCHES + ELBOW_TO_CLAW_LENGTH_INCHES;
+    public static double TOTAL_ARM_REACH_INCHES = SHOULDER_TO_ELBOW_LENGTH_INCHES ;
 
     // ========== AUTOMATIC INTAKE ==========
     
@@ -34,10 +29,16 @@ public class IntakeConstants {
     public static int AUTO_ARM_POSITION_TIME = 600;
     
     /** Maximum reach distance for automatic intake (inches) */
-    public static double AUTO_INTAKE_MAX_REACH = 15.75; // 40cm converted to inches
+    public static double AUTO_INTAKE_MAX_SLIDE_REACH = 15.75; // 40cm converted to inches
     
-    /** Maximum angle for turret automatic positioning (degrees) */
-    public static double AUTO_INTAKE_MAX_ANGLE = 135.0;
+    /** Maximum angle for turret automatic positioning - LEFT side (degrees) */
+    public static double AUTO_INTAKE_TURRET_LEFT_MAX_ANGLE = 100.0;
+
+    /** Maximum angle for turret automatic positioning - RIGHT side (degrees) */
+    public static double AUTO_INTAKE_TURRET_RIGHT_MAX_ANGLE = 115.0;
+
+    /** Legacy maximum angle for backward compatibility (uses the smaller of left/right) */
+    public static double AUTO_INTAKE_TURRET_MAX_ANGLE = Math.min(AUTO_INTAKE_TURRET_LEFT_MAX_ANGLE, AUTO_INTAKE_TURRET_RIGHT_MAX_ANGLE);
     
     /** Minimum distance for safe automatic pickup (inches) */
     public static double AUTO_INTAKE_MIN_DISTANCE = 3.0;
@@ -189,7 +190,7 @@ public class IntakeConstants {
     // ========== TURRET POSITIONS ==========
     
     /** Turret left position */
-    public static double TURRET_LEFT = 0.99;
+    public static double TURRET_LEFT = 0.91;
     
     /** Turret maximum offset */
     public static double TURRET_MAX_OFFSET = 0.985;

@@ -170,17 +170,31 @@ public class SimpleVisionIntake {
     }
     
     /**
-     * Calculate intake servo positions based on sample distance and angle
+     * Calculate intake servo positions based on sample distance and angle using asymmetric limits
      */
     private void calculateIntakePositions(double distance, double angle) {
-        // Calculate turret position based on sample angle
-        // Clamp angle to safe limits
-        double clampedAngle = Math.max(-135.0, Math.min(135.0, angle));
-        
-        // Map angle to turret servo position
-        // Turret middle (0.5) = straight ahead (0°)
+        // Calculate turret position based on sample angle with asymmetric limits
+        double clampedAngle;
+        if (angle >= 0) {
+            // Left side - use left max angle
+            clampedAngle = Math.min(angle, IntakeConstants.AUTO_INTAKE_TURRET_LEFT_MAX_ANGLE);
+        } else {
+            // Right side - use right max angle
+            clampedAngle = Math.max(angle, -IntakeConstants.AUTO_INTAKE_TURRET_RIGHT_MAX_ANGLE);
+        }
+
+        // Map angle to turret servo position using asymmetric scaling
         double turretRange = IntakeConstants.TURRET_LEFT - IntakeConstants.TURRET_RIGHT;
-        double normalizedAngle = clampedAngle / 135.0; // Normalize to -1 to 1
+        double normalizedAngle;
+
+        if (clampedAngle >= 0) {
+            // Left side: scale by left max angle
+            normalizedAngle = clampedAngle / IntakeConstants.AUTO_INTAKE_TURRET_LEFT_MAX_ANGLE;
+        } else {
+            // Right side: scale by right max angle
+            normalizedAngle = clampedAngle / IntakeConstants.AUTO_INTAKE_TURRET_RIGHT_MAX_ANGLE;
+        }
+
         targetTurretPosition = IntakeConstants.TURRET_MIDDLE + (normalizedAngle * turretRange / 2.0);
         
         // Clamp turret position to safe limits
@@ -189,7 +203,7 @@ public class SimpleVisionIntake {
         
         // Calculate slide position based on distance
         // Limit distance to safe reach
-        double maxReach = IntakeConstants.AUTO_INTAKE_MAX_REACH;
+        double maxReach = IntakeConstants.AUTO_INTAKE_MAX_SLIDE_REACH;
         double clampedDistance = Math.max(IntakeConstants.AUTO_INTAKE_MIN_DISTANCE, 
                                         Math.min(distance, maxReach));
         
@@ -200,7 +214,10 @@ public class SimpleVisionIntake {
         // Keep wrist centered for now (you can add wrist angle calculation later if needed)
         targetWristPosition = IntakeConstants.WRIST_MIDDLE;
         
-        opMode.telemetry.addData("Calc Angle", String.format("%.1f° (clamped from %.1f°)", clampedAngle, angle));
+        String angleLimit = angle >= 0 ?
+            String.format("L:%.0f°", IntakeConstants.AUTO_INTAKE_TURRET_LEFT_MAX_ANGLE) :
+            String.format("R:%.0f°", IntakeConstants.AUTO_INTAKE_TURRET_RIGHT_MAX_ANGLE);
+        opMode.telemetry.addData("Calc Angle", String.format("%.1f° (clamped from %.1f°, limit %s)", clampedAngle, angle, angleLimit));
         opMode.telemetry.addData("Calc Distance", String.format("%.1f\" (clamped from %.1f\")", clampedDistance, distance));
     }
     

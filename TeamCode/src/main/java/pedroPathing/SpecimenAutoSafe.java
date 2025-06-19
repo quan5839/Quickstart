@@ -286,14 +286,14 @@ public class SpecimenAutoSafe extends OpMode {
         case 3:
             if(!follower.isBusy()) {
                 // Move to push position for sample 1
-                follower.followPath(pushPickup1, true);
+                follower.followPath(pushPickup1, false);
                 setPathState(4);
             }
             break;
         case 4:
             if (!follower.isBusy()){
                 // Push sample 1 into pickup area - no intake operations needed
-                follower.followPath(retrievePickup1, true);
+                follower.followPath(retrievePickup1, false);
                 setPathState(5);
             }
             break;
@@ -308,7 +308,7 @@ public class SpecimenAutoSafe extends OpMode {
         case 6:
             if(!follower.isBusy()) {
                 // Push sample 2 into pickup area - no intake operations needed
-                follower.followPath(retrievePickup2, true);
+                follower.followPath(retrievePickup2, false);
                 setPathState(7);
             }
             break;
@@ -322,7 +322,7 @@ public class SpecimenAutoSafe extends OpMode {
         case 8:
             if(!follower.isBusy()) {
                 // Push sample 3 into pickup area - no intake operations needed
-                follower.followPath(retrievePickup3, true);
+                follower.followPath(retrievePickup3, false);
                 setPathState(9);
             }
             break;

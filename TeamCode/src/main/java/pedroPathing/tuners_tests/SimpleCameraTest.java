@@ -108,7 +108,6 @@ public class SimpleCameraTest extends LinearOpMode {
 
                             // Calculate distance using camera constants
                             double distance = calculateDistance(pixelX, pixelY);
-                            telemetry.addData("Calculated Distance", String.format("%.1f inches", distance));
 
                             // Show intermediate calculations for verification
                             double verticalAngle = fieldAngles[1];
@@ -182,13 +181,13 @@ public class SimpleCameraTest extends LinearOpMode {
                 }
 
                 // Show intake reach area info
-                double slideReachInches = VisionConstants.INTAKE_SLIDE_MAX_EXTENSION_CM * 0.393701;
-                double shoulderReachInches = VisionConstants.INTAKE_SHOULDER_REACH_CM * 0.393701;
+                double slideReachInches = VisionConstants.INTAKE_SLIDE_MAX_EXTENSION_IN;
+                double shoulderReachInches = VisionConstants.INTAKE_SHOULDER_REACH_IN;
                 telemetry.addData("=== INTAKE REACH AREA ===", "");
                 telemetry.addData("Intake Position", String.format("Forward:%.1f Left:%.1f from robot center",
                     VisionConstants.INTAKE_BASE_OFFSET_X, VisionConstants.INTAKE_BASE_OFFSET_Y));
-                telemetry.addData("Slide Reach", String.format("%.1f inches forward (%.0fcm)", slideReachInches, VisionConstants.INTAKE_SLIDE_MAX_EXTENSION_CM));
-                telemetry.addData("Shoulder Reach", String.format("±%.1f inches left/right (±%.0fcm)", shoulderReachInches, VisionConstants.INTAKE_SHOULDER_REACH_CM));
+                telemetry.addData("Slide Reach", String.format("%.1f inches forward", slideReachInches));
+                telemetry.addData("Shoulder Reach", String.format("±%.1f inches left/right", shoulderReachInches));
 
                 if (VisionConstants.ENABLE_INSIDE_AREA_REACH) {
                     telemetry.addData("Mode", "FULL AREA (less accurate, all positions)");
@@ -309,7 +308,8 @@ public class SimpleCameraTest extends LinearOpMode {
 
         // Convert pixel to normalized coordinate (-1 to 1)
         // Center pixel should give 0 degrees
-        double normalizedX = (pixelX - (actualWidth / 2.0)) / (actualWidth / 2.0);
+        // Invert normalizedX to fix X mirroring
+        double normalizedX = -(pixelX - (actualWidth / 2.0)) / (actualWidth / 2.0);
 
         // Convert to angle using camera FOV
         // Positive angle = left side of image, Negative angle = right side
@@ -331,10 +331,8 @@ public class SimpleCameraTest extends LinearOpMode {
         double normalizedY = (pixelY - (actualHeight / 2.0)) / (actualHeight / 2.0);
 
         // Convert to angle using camera FOV
-        // CRITICAL: Invert Y because camera Y=0 is top, but we want positive angles upward
-        // When sample is in upper part of image (low pixelY), angle should be positive (up)
-        // When sample is in lower part of image (high pixelY), angle should be negative (down)
-        return -normalizedY * (VisionConstants.CAMERA_FOV_VERTICAL / 2.0);
+        // Remove minus to fix Y mirroring
+        return normalizedY * (VisionConstants.CAMERA_FOV_VERTICAL / 2.0);
     }
 
     /**
@@ -346,69 +344,32 @@ public class SimpleCameraTest extends LinearOpMode {
      * @return true if position is reachable by intake
      */
     private boolean isWithinIntakeReach(double forwardDistance, double leftDistance) {
-        // Convert cm to inches for slide and shoulder limits
-        double slideReachInches = VisionConstants.INTAKE_SLIDE_MAX_EXTENSION_CM * 0.393701; // 40cm = 15.75"
-        double shoulderReachInches = VisionConstants.INTAKE_SHOULDER_REACH_CM * 0.393701; // 17cm = 6.69"
+        // Use correct constants in inches
+        double slideReachInches = VisionConstants.INTAKE_SLIDE_MAX_EXTENSION_IN;
+        double shoulderReachInches = VisionConstants.INTAKE_SHOULDER_REACH_IN;
 
         // Calculate sample position relative to INTAKE position (not robot center)
         // The D-shape stadium is centered on the intake, not the robot center
         double sampleRelativeToIntakeX = forwardDistance - VisionConstants.INTAKE_BASE_OFFSET_X;
         double sampleRelativeToIntakeY = leftDistance - VisionConstants.INTAKE_BASE_OFFSET_Y;
 
-        double absSampleToIntakeY = Math.abs(sampleRelativeToIntakeY);
-
-        // Cannot reach anything behind intake position
-        if (sampleRelativeToIntakeX < 0) {
-            return false;
+        // Case 1: Rectangle region
+        if (sampleRelativeToIntakeX >= 0 && sampleRelativeToIntakeX <= slideReachInches && Math.abs(sampleRelativeToIntakeY) <= shoulderReachInches) {
+            return true;
         }
 
-        if (VisionConstants.ENABLE_INSIDE_AREA_REACH) {
-            // MODE: Full area reach (less accurate but covers all reachable positions)
+        // Case 2: Left of intake base (only at intake base position)
+        if (sampleRelativeToIntakeX < 0) {
+            double dist = Math.hypot(sampleRelativeToIntakeX, sampleRelativeToIntakeY);
+            if (dist <= shoulderReachInches) return true;
+        }
 
-            // Check if within rectangular portion (0 to slide reach forward from intake)
-            if (sampleRelativeToIntakeX <= slideReachInches && absSampleToIntakeY <= shoulderReachInches) {
-                return true;
-            }
-
-            // Check front semicircle (beyond slide reach, within shoulder radius from intake)
-            if (sampleRelativeToIntakeX > slideReachInches) {
-                double frontCenterX = slideReachInches;
-                double distanceFromFrontCenter = Math.sqrt(
-                    Math.pow(sampleRelativeToIntakeX - frontCenterX, 2) +
-                    Math.pow(sampleRelativeToIntakeY, 2)
-                );
-                return distanceFromFrontCenter <= shoulderReachInches;
-            }
-
-        } else {
-            // MODE: Boundary lines only (more accurate positioning)
-
-            double tolerance = VisionConstants.BOUNDARY_TOLERANCE_INCHES;
-
-            // Check if on the rectangular boundary lines (relative to intake position)
-            if (sampleRelativeToIntakeX <= slideReachInches) {
-                // On left or right side lines (at shoulder reach distance from intake)
-                if (Math.abs(absSampleToIntakeY - shoulderReachInches) <= tolerance) {
-                    return true;
-                }
-                // On front line (at slide reach distance from intake, within shoulder reach)
-                if (Math.abs(sampleRelativeToIntakeX - slideReachInches) <= tolerance && absSampleToIntakeY <= shoulderReachInches) {
-                    return true;
-                }
-            }
-
-            // Check if on front semicircle boundary (beyond slide reach from intake)
-            if (sampleRelativeToIntakeX > slideReachInches) {
-                double frontCenterX = slideReachInches;
-                double distanceFromFrontCenter = Math.sqrt(
-                    Math.pow(sampleRelativeToIntakeX - frontCenterX, 2) +
-                    Math.pow(sampleRelativeToIntakeY, 2)
-                );
-                // On the semicircle perimeter (at shoulder reach radius from intake)
-                if (Math.abs(distanceFromFrontCenter - shoulderReachInches) <= tolerance) {
-                    return true;
-                }
-            }
+        // Case 3: Beyond slide reach, semicircle at (slideReach, 0)
+        if (sampleRelativeToIntakeX > slideReachInches) {
+            double dx = sampleRelativeToIntakeX - slideReachInches;
+            double dy = sampleRelativeToIntakeY;
+            double dist = Math.hypot(dx, dy);
+            if (dist <= shoulderReachInches) return true;
         }
 
         return false;

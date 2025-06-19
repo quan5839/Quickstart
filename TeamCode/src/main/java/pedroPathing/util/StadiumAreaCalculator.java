@@ -49,7 +49,7 @@ public class StadiumAreaCalculator {
         double angleDegrees = Math.toDegrees(angle);
         
         // Basic distance and angle checks
-        if (distance > IntakeConstants.AUTO_INTAKE_MAX_REACH) {
+        if (distance > IntakeConstants.AUTO_INTAKE_MAX_SLIDE_REACH) {
             return false;
         }
         
@@ -57,9 +57,17 @@ public class StadiumAreaCalculator {
             return false;
         }
         
-        // Check turret angle limits (forward-facing intake only)
-        if (Math.abs(angleDegrees) > IntakeConstants.AUTO_INTAKE_MAX_ANGLE) {
-            return false;
+        // Check turret angle limits with asymmetric constraints
+        if (angleDegrees >= 0) {
+            // Left side - check against left max angle
+            if (angleDegrees > IntakeConstants.AUTO_INTAKE_TURRET_LEFT_MAX_ANGLE) {
+                return false;
+            }
+        } else {
+            // Right side - check against right max angle
+            if (angleDegrees < -IntakeConstants.AUTO_INTAKE_TURRET_RIGHT_MAX_ANGLE) {
+                return false;
+            }
         }
         
         // Stadium area calculation
@@ -146,9 +154,14 @@ public class StadiumAreaCalculator {
         double angle = Math.atan2(adjustedY, adjustedX);
         double angleDegrees = Math.toDegrees(angle);
         
-        // Clamp angle to limits
-        angleDegrees = Math.max(-IntakeConstants.AUTO_INTAKE_MAX_ANGLE, 
-                               Math.min(angleDegrees, IntakeConstants.AUTO_INTAKE_MAX_ANGLE));
+        // Clamp angle to asymmetric limits
+        if (angleDegrees >= 0) {
+            // Left side - use left max angle
+            angleDegrees = Math.min(angleDegrees, IntakeConstants.AUTO_INTAKE_TURRET_LEFT_MAX_ANGLE);
+        } else {
+            // Right side - use right max angle
+            angleDegrees = Math.max(angleDegrees, -IntakeConstants.AUTO_INTAKE_TURRET_RIGHT_MAX_ANGLE);
+        }
         angle = Math.toRadians(angleDegrees);
         
         // Clamp distance to stadium boundary
@@ -170,17 +183,17 @@ public class StadiumAreaCalculator {
      */
     public static double getMaxReachAtAngle(double angleDegrees) {
         double angleRad = Math.toRadians(angleDegrees);
-        double x = IntakeConstants.AUTO_INTAKE_MAX_REACH * Math.cos(angleRad);
-        double y = IntakeConstants.AUTO_INTAKE_MAX_REACH * Math.sin(angleRad);
+        double x = IntakeConstants.AUTO_INTAKE_MAX_SLIDE_REACH * Math.cos(angleRad);
+        double y = IntakeConstants.AUTO_INTAKE_MAX_SLIDE_REACH * Math.sin(angleRad);
         
         // Check if this position is in the stadium area
         if (isInStadiumBoundary(x, y)) {
-            return IntakeConstants.AUTO_INTAKE_MAX_REACH;
+            return IntakeConstants.AUTO_INTAKE_MAX_SLIDE_REACH;
         }
         
         // Binary search for maximum reachable distance at this angle
         double minDist = IntakeConstants.AUTO_INTAKE_MIN_DISTANCE;
-        double maxDist = IntakeConstants.AUTO_INTAKE_MAX_REACH;
+        double maxDist = IntakeConstants.AUTO_INTAKE_MAX_SLIDE_REACH;
         double tolerance = 0.1; // inches
         
         while (maxDist - minDist > tolerance) {
@@ -214,15 +227,24 @@ public class StadiumAreaCalculator {
         double angle = Math.atan2(reachableY, reachableX);
         double angleDegrees = Math.toDegrees(angle);
         
-        // Calculate turret position
+        // Calculate turret position using asymmetric angle scaling
         double turretRange = IntakeConstants.TURRET_LEFT - IntakeConstants.TURRET_RIGHT;
-        double normalizedAngle = angleDegrees / IntakeConstants.AUTO_INTAKE_MAX_ANGLE;
+        double normalizedAngle;
+
+        if (angleDegrees >= 0) {
+            // Left side: scale by left max angle
+            normalizedAngle = angleDegrees / IntakeConstants.AUTO_INTAKE_TURRET_LEFT_MAX_ANGLE;
+        } else {
+            // Right side: scale by right max angle
+            normalizedAngle = angleDegrees / IntakeConstants.AUTO_INTAKE_TURRET_RIGHT_MAX_ANGLE;
+        }
+
         double turretPosition = IntakeConstants.TURRET_MIDDLE + (normalizedAngle * turretRange / 2.0);
         turretPosition = Math.max(IntakeConstants.TURRET_RIGHT, 
                                  Math.min(turretPosition, IntakeConstants.TURRET_LEFT));
         
         // Calculate slide position
-        double slideExtension = Math.min(distance / IntakeConstants.AUTO_INTAKE_MAX_REACH, 1.0);
+        double slideExtension = Math.min(distance / IntakeConstants.AUTO_INTAKE_MAX_SLIDE_REACH, 1.0);
         double slidePosition = IntakeConstants.SLIDE_MIN - 
             (slideExtension * (IntakeConstants.SLIDE_MIN - IntakeConstants.SLIDE_MAX));
         
@@ -242,8 +264,9 @@ public class StadiumAreaCalculator {
         return new String[]{
             String.format("Slide Length: %.1f\"", IntakeConstants.SLIDE_LENGTH_INCHES),
             String.format("Shoulder Radius: %.1f\"", IntakeConstants.SHOULDER_RADIUS_INCHES),
-            String.format("Max Reach: %.1f\"", IntakeConstants.AUTO_INTAKE_MAX_REACH),
-            String.format("Max Angle: %.1f°", IntakeConstants.AUTO_INTAKE_MAX_ANGLE),
+            String.format("Max Reach: %.1f\"", IntakeConstants.AUTO_INTAKE_MAX_SLIDE_REACH),
+            String.format("Left Max Angle: %.1f°", IntakeConstants.AUTO_INTAKE_TURRET_LEFT_MAX_ANGLE),
+            String.format("Right Max Angle: %.1f°", IntakeConstants.AUTO_INTAKE_TURRET_RIGHT_MAX_ANGLE),
             String.format("Safety Margin: %.1f\"", IntakeConstants.STADIUM_SAFETY_MARGIN),
             String.format("Area Check: %s", IntakeConstants.ENABLE_STADIUM_AREA_CHECK ? "ENABLED" : "DISABLED")
         };
@@ -261,7 +284,7 @@ public class StadiumAreaCalculator {
         
         // Check that max reach is reasonable
         double expectedMaxReach = IntakeConstants.SLIDE_LENGTH_INCHES + IntakeConstants.SHOULDER_RADIUS_INCHES;
-        if (Math.abs(IntakeConstants.AUTO_INTAKE_MAX_REACH - expectedMaxReach) > 2.0) {
+        if (Math.abs(IntakeConstants.AUTO_INTAKE_MAX_SLIDE_REACH - expectedMaxReach) > 2.0) {
             return false; // More than 2" difference is suspicious
         }
         
