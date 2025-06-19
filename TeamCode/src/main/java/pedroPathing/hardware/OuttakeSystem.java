@@ -18,8 +18,8 @@ public class OuttakeSystem {
     private Servo wrist;
     private Servo claw;
     private RevColorSensorV3 colorSensor;
-    private ColorDetectionUtil colorUtil;
-    private OpMode opMode;
+    private ColorDetectionUtil colorDetectionUtil;
+    private OpMode myOpMode;
     private DigitalChannel slideLimit;
 
     // Track the logical state of the subsystem
@@ -28,7 +28,7 @@ public class OuttakeSystem {
     private OuttakeState currentState = OuttakeState.IDLE;
 
     public OuttakeSystem(OpMode opMode) {
-        this.opMode = opMode;
+        this.myOpMode = opMode;
     }
 
     private Servo safeInitServo(String name, Servo.Direction direction, Double servoMin, Double servoMax, Double position) {
@@ -51,7 +51,7 @@ public class OuttakeSystem {
         elbowRight = safeInitServo("outtakeElbowRight", Servo.Direction.REVERSE, OuttakeConstants.ELBOW_INIT);
         elbowLeft = safeInitServo("outtakeElbowLeft", Servo.Direction.FORWARD, OuttakeConstants.ELBOW_INIT);
         wrist = safeInitServo("outtakeWrist", Servo.Direction.FORWARD, OuttakeConstants.WRIST_INIT);
-        claw = safeInitServo("outtakeClaw", Servo.Direction.FORWARD, OuttakeConstants.CLAW_CLOSED, OuttakeConstants.CLAW_OPEN, OuttakeConstants.CLAW_OPEN);
+        claw = safeInitServo("outtakeClaw", Servo.Direction.FORWARD, OuttakeConstants.CLAW_OPEN);
         slideRight = myOpMode.hardwareMap.get(DcMotorEx.class, "outtakeSlideRight");
         slideLeft = myOpMode.hardwareMap.get(DcMotorEx.class, "outtakeSlideLeft");
         slideRight.setDirection(DcMotor.Direction.FORWARD);

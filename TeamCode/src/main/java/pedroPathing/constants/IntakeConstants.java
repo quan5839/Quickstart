@@ -10,13 +10,8 @@ public class IntakeConstants {
     private IntakeConstants() {}
 
     // ========== ARM KINEMATICS ==========
-    
-    /** Estimated length from elbow to claw tip (inches) - MEASURE THIS */
-    public static double ELBOW_TO_CLAW_LENGTH_INCHES = 4.0;
-    
-    /** Height of shoulder joint above ground when robot is level (inches) - MEASURE THIS */
-    public static double SHOULDER_HEIGHT_INCHES = 8.0;
-    
+
+
 
     /** Length from shoulder joint to elbow joint (mm) */
     public static double SHOULDER_TO_ELBOW_LENGTH_MM = 172.353;
@@ -25,7 +20,7 @@ public class IntakeConstants {
     public static double SHOULDER_TO_ELBOW_LENGTH_INCHES = SHOULDER_TO_ELBOW_LENGTH_MM / 25.4;
 
     /** Total arm reach from shoulder pivot to claw tip (inches) */
-    public static double TOTAL_ARM_REACH_INCHES = SHOULDER_TO_ELBOW_LENGTH_INCHES + ELBOW_TO_CLAW_LENGTH_INCHES;
+    public static double TOTAL_ARM_REACH_INCHES = SHOULDER_TO_ELBOW_LENGTH_INCHES;
 
     // ========== AUTOMATIC INTAKE ==========
     
@@ -93,31 +88,31 @@ public class IntakeConstants {
     // ========== SHOULDER POSITIONS ==========
     
     /** Shoulder grab position */
-    public static double SHOULDER_GRAB = 0.0;
+    public static double SHOULDER_GRAB = 0.02;
     
     /** Shoulder hold position */
-    public static double SHOULDER_HOLD = 0.6;
+    public static double SHOULDER_HOLD = 0.66;
     
     /** Shoulder initialization position */
-    public static double SHOULDER_INIT = 0.6;
+    public static double SHOULDER_INIT = 0.66;
     
     /** Shoulder outtake transition position */
-    public static double SHOULDER_OUTTAKE_TRANSITION = 0.22;
+    public static double SHOULDER_OUTTAKE_TRANSITION = 0.28;
     
     /** Shoulder outtake transition prep position */
-    public static double SHOULDER_OUTTAKE_TRANSITION_PREP = 0.12;
+    public static double SHOULDER_OUTTAKE_TRANSITION_PREP = 0.22;
     
     /** Shoulder prep position */
-    public static double SHOULDER_PREP = 0.025;
+    public static double SHOULDER_PREP = 0.09;
     
     /** Shoulder release position */
-    public static double SHOULDER_RELEASE = 0.1;
+    public static double SHOULDER_RELEASE = 0.16;
     
     /** Shoulder remove position */
-    public static double SHOULDER_REMOVE = 0.1;
+    public static double SHOULDER_REMOVE = 0.16;
     
     /** Shoulder rest position */
-    public static double SHOULDER_REST = 0.5;
+    public static double SHOULDER_REST = 0.56;
 
     // ========== SLIDE POSITIONS ==========
     
@@ -128,7 +123,7 @@ public class IntakeConstants {
     public static double SLIDE_HOLD = 1;
     
     /** Slide maximum position */
-    public static double SLIDE_MAX = 0.1;
+    public static double SLIDE_MAX = 0.015;
     
     /** Slide maximum extension position */
     public static double SLIDE_MAX_EXTENSION = 0.26;
@@ -137,27 +132,27 @@ public class IntakeConstants {
     public static double SLIDE_MAX_OVERRIDE = 0;
     
     /** Slide minimum position */
-    public static double SLIDE_MIN = 0.8;
+    public static double SLIDE_MIN = 0.29;
     
     /** Slide release position */
-    public static double SLIDE_RELEASE = 0.32;
+    public static double SLIDE_RELEASE = 0;
 
     // ========== TIMING CONSTANTS ==========
     
     /** Claw closed time (ms) */
-    public static int CLAW_CLOSED_TIME = 175;
+    public static int CLAW_CLOSED_TIME = 80;
     
     /** Intake claw release time (ms) */
     public static int INTAKE_CLAW_RELEASE = 300;
     
     /** Intake limit switch delay (ms) */
-    public static int INTAKE_LIMIT_SWITCH_DELAY = 600;
+    public static int INTAKE_LIMIT_SWITCH_DELAY = 500;
     
     /** Intake shoulder grab close time (ms) */
     public static int INTAKE_SHOULDER_GRAB_CLOSE_TIME = 250;
     
     /** Intake shoulder outtake transition prep time (ms) */
-    public static int INTAKE_SHOULDER_OUTTAKE_TRANSITION_PREP_TIME = 800;
+    public static int INTAKE_SHOULDER_OUTTAKE_TRANSITION_PREP_TIME = 550;
     
     /** Sample remove time (ms) */
     public static int SAMPLE_REMOVE_TIME = 200;
@@ -166,10 +161,13 @@ public class IntakeConstants {
     public static int SLIDE_HOLD_POSITION_END_DELAY = 0;
     
     /** Slide release time (ms) */
-    public static int SLIDE_RELEASE_TIME = 150;
+    public static int SLIDE_RELEASE_TIME = 200;
 
     /** Auto-return delay from hold to min position (ms) */
     public static int SLIDE_AUTO_RETURN_DELAY = 800;
+
+    public static int INTAKE_ELBOWS_PREP = 500;
+
 
     // ========== TURRET POSITIONS ==========
     

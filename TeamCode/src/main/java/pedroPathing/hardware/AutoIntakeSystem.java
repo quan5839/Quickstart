@@ -286,8 +286,8 @@
 //                double ty = visionSystem.getTargetY(); // Vertical angle
 //
 //                // Convert angles to pixel coordinates
-//                pixelX = (tx / (CameraConstants.CAMERA_FOV_HORIZONTAL / 2.0)) * (CameraConstants.CAMERA_WIDTH / 2.0) + (CameraConstants.CAMERA_WIDTH / 2.0);
-//                pixelY = (-ty / (CameraConstants.CAMERA_FOV_VERTICAL / 2.0)) * (CameraConstants.CAMERA_HEIGHT_PIXELS / 2.0) + (CameraConstants.CAMERA_HEIGHT_PIXELS / 2.0);
+//                pixelX = (tx / (VisionConstants.CAMERA_FOV_HORIZONTAL / 2.0)) * (VisionConstants.CAMERA_WIDTH / 2.0) + (VisionConstants.CAMERA_WIDTH / 2.0);
+//                pixelY = (-ty / (VisionConstants.CAMERA_FOV_VERTICAL / 2.0)) * (VisionConstants.CAMERA_HEIGHT_PIXELS / 2.0) + (VisionConstants.CAMERA_HEIGHT_PIXELS / 2.0);
 //            }
 //
 //            // Calculate distance and position using camera geometry
@@ -311,16 +311,16 @@
 //     * Calculate horizontal field angle from pixel X coordinate
 //     */
 //    private double calculateFieldAngleX(double pixelX) {
-//        double normalizedX = (pixelX - (CameraConstants.CAMERA_WIDTH / 2.0)) / (CameraConstants.CAMERA_WIDTH / 2.0);
-//        return normalizedX * (CameraConstants.CAMERA_FOV_HORIZONTAL / 2.0);
+//        double normalizedX = (pixelX - (VisionConstants.CAMERA_WIDTH / 2.0)) / (VisionConstants.CAMERA_WIDTH / 2.0);
+//        return normalizedX * (VisionConstants.CAMERA_FOV_HORIZONTAL / 2.0);
 //    }
 //
 //    /**
 //     * Calculate vertical field angle from pixel Y coordinate
 //     */
 //    private double calculateFieldAngleY(double pixelY) {
-//        double normalizedY = (pixelY - (CameraConstants.CAMERA_HEIGHT_PIXELS / 2.0)) / (CameraConstants.CAMERA_HEIGHT_PIXELS / 2.0);
-//        return -normalizedY * (CameraConstants.CAMERA_FOV_VERTICAL / 2.0);
+//        double normalizedY = (pixelY - (VisionConstants.CAMERA_HEIGHT_PIXELS / 2.0)) / (VisionConstants.CAMERA_HEIGHT_PIXELS / 2.0);
+//        return -normalizedY * (VisionConstants.CAMERA_FOV_VERTICAL / 2.0);
 //    }
 //
 //    /**
@@ -329,17 +329,17 @@
 //    private double calculateImprovedDistance(double pixelX, double pixelY) {
 //        try {
 //            double verticalAngle = calculateFieldAngleY(pixelY);
-//            double effectiveAngle = Math.toRadians(verticalAngle + CameraConstants.CAMERA_TILT_ANGLE);
+//            double effectiveAngle = Math.toRadians(verticalAngle + VisionConstants.CAMERA_TILT_ANGLE);
 //
 //            if (Math.abs(effectiveAngle) > 0.01) {
-//                double distance = (CameraConstants.CAMERA_HEIGHT - CameraConstants.SAMPLE_HEIGHT) / Math.tan(Math.abs(effectiveAngle));
-//                return Math.max(CameraConstants.MIN_DETECTION_DISTANCE,
-//                       Math.min(distance, CameraConstants.MAX_DETECTION_DISTANCE));
+//                double distance = (VisionConstants.CAMERA_HEIGHT - VisionConstants.SAMPLE_HEIGHT) / Math.tan(Math.abs(effectiveAngle));
+//                return Math.max(VisionConstants.MIN_DETECTION_DISTANCE,
+//                       Math.min(distance, VisionConstants.MAX_DETECTION_DISTANCE));
 //            } else {
-//                return CameraConstants.DEFAULT_DISTANCE;
+//                return VisionConstants.DEFAULT_DISTANCE;
 //            }
 //        } catch (Exception e) {
-//            return CameraConstants.DEFAULT_DISTANCE;
+//            return VisionConstants.DEFAULT_DISTANCE;
 //        }
 //    }
 //
@@ -353,8 +353,8 @@
 //            double cameraRelativeX = distance * Math.cos(Math.toRadians(horizontalAngle));
 //            double cameraRelativeY = distance * Math.sin(Math.toRadians(horizontalAngle));
 //
-//            double robotRelativeX = cameraRelativeX + CameraConstants.CAMERA_OFFSET_X;
-//            double robotRelativeY = cameraRelativeY + CameraConstants.CAMERA_OFFSET_Y;
+//            double robotRelativeX = cameraRelativeX + VisionConstants.CAMERA_OFFSET_X;
+//            double robotRelativeY = cameraRelativeY + VisionConstants.CAMERA_OFFSET_Y;
 //
 //            return new double[]{robotRelativeX, robotRelativeY};
 //        } catch (Exception e) {
@@ -371,7 +371,7 @@
 //            // Target position for the claw (relative to shoulder joint)
 //            // Assume shoulder is at robot center for now - adjust based on actual mounting
 //            double targetX = targetDistance; // Forward distance to sample
-//            double targetZ = CameraConstants.SAMPLE_HEIGHT - IntakeConstants.SHOULDER_HEIGHT_INCHES; // Height difference
+//            double targetZ = VisionConstants.SAMPLE_HEIGHT; // Height difference
 //
 //            // Calculate distance from shoulder to target
 //            double shoulderToTarget = Math.sqrt(targetX * targetX + targetZ * targetZ);
@@ -385,7 +385,7 @@
 //                return;
 //            }
 //
-//            if (shoulderToTarget < Math.abs(IntakeConstants.SHOULDER_TO_ELBOW_LENGTH_INCHES - IntakeConstants.ELBOW_TO_CLAW_LENGTH_INCHES)) {
+//            if (shoulderToTarget < Math.abs(IntakeConstants.SHOULDER_TO_ELBOW_LENGTH_INCHES )) {
 //                opMode.telemetry.addData("Arm Kinematics", "Target unreachable - too close");
 //                // Use default grab positions
 //                calculatedShoulderPosition = IntakeConstants.SHOULDER_GRAB;

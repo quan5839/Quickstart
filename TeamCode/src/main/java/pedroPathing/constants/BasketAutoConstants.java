@@ -57,7 +57,7 @@ public class BasketAutoConstants {
     public static double PICKUP3_X = 14;
     
     /** Pickup 3 Y position (inches) */
-    public static double PICKUP3_Y = 132.5;
+    public static double PICKUP3_Y = 131.8;
 
     // ========== SAMPLE INTAKE POSITIONS ==========
     
@@ -71,13 +71,13 @@ public class BasketAutoConstants {
     public static double SAMPLE2_TURRET_POS = 0.65;
     
     /** Sample 2 wrist position */
-    public static double SAMPLE2_WRIST_POS = 0.8;
+    public static double SAMPLE2_WRIST_POS = 0.4;
     
     /** Sample 3 turret position */
     public static double SAMPLE3_TURRET_POS = 0.8;
     
     /** Sample 3 wrist position */
-    public static double SAMPLE3_WRIST_POS = 0.3;
+    public static double SAMPLE3_WRIST_POS = 0.2;
 
     // ========== SCORE POSITIONS ==========
     

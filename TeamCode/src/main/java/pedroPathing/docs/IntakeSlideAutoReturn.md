@@ -1,14 +1,14 @@
 # Intake Slide Auto-Return Functionality
 
 ## Overview
-The intake slide auto-return functionality automatically moves the intake slide from the HOLD position to the MIN position after a configurable timer or when a limit switch is triggered. This replaces manual slide positioning and ensures consistent behavior.
+The intake slide auto-return functionality automatically moves the intake slide from the HOLD position to the MIN position after a configurable timer or when a limit switch is triggered. This replaces manual `setIntakeSlidePosition(SLIDE_HOLD)` calls with automatic return behavior.
 
 ## Key Features
-- **Timer-based auto-return**: Configurable delay before returning to minimum position
-- **Limit switch detection**: Faster return when mechanical limit switch is triggered
-- **Drop-in replacement**: Can replace existing `setIntakeSlidePosition` calls
-- **State machine integration**: Works with the existing state machine reset system
-- **Thread-safe**: Safe for use in autonomous and teleop modes
+- **Automatic return**: When slide moves to HOLD position, automatically returns to MIN after delay
+- **Uses existing system**: Integrates with the existing `scheduleIntakeSlideReset` system
+- **Drop-in replacement**: Simply replace `setIntakeSlidePosition(SLIDE_HOLD)` calls
+- **Limit switch detection**: Enhanced reset system checks both timer and limit switch
+- **No code duplication**: Reuses existing state machine infrastructure
 
 ## New Constants Added
 
@@ -29,46 +29,31 @@ public boolean isSlideAtMinPosition()
 - Checks if slide has reached minimum position using limit switch or position feedback
 - Similar to existing `isSlideAtHoldPosition()` method
 
-#### 2. `setIntakeSlidePositionSmart(double position, boolean enableAutoReturn)`
-```java
-public void setIntakeSlidePositionSmart(double position, boolean enableAutoReturn)
-```
-- Smart positioning with optional auto-return functionality
-- Integrates with state machine for optimal performance
-- Use when you have access to the state machine (teleop mode)
-
-#### 3. `setIntakeSlidePositionSmart(double position)`
-```java
-public void setIntakeSlidePositionSmart(double position)
-```
-- Smart positioning with auto-return enabled by default
-- Convenience method for most use cases
-
-#### 4. `setIntakeSlidePositionWithAutoReturn(double position)`
+#### 2. `setIntakeSlidePositionWithAutoReturn(double position)`
 ```java
 public void setIntakeSlidePositionWithAutoReturn(double position)
 ```
-- Thread-based auto-return for autonomous or when state machine is unavailable
-- Drop-in replacement for `setIntakeSlidePosition`
-- Works independently of state machine
+- Drop-in replacement for `setIntakeSlidePosition(SLIDE_HOLD)` calls
+- Automatically schedules return to MIN position when moving to HOLD
+- Uses existing `scheduleIntakeSlideReset` system
 
 ### RobotStateMachine.java
 
-#### 5. `scheduleIntakeSlideAutoReturn(long delayMs)`
+#### 3. `scheduleIntakeSlideAutoReturn(long delayMs)`
 ```java
 public void scheduleIntakeSlideAutoReturn(long delayMs)
 ```
-- Public method to schedule auto-return from external classes
-- Integrates with existing intake slide reset system
+- Public wrapper for existing `scheduleIntakeSlideReset` system
+- Allows external classes to trigger auto-return
 
 ### BaseTeleop25152.java
 
-#### 6. `getStateMachine()`
+#### 4. `getStateMachine()`
 ```java
 public RobotStateMachine getStateMachine()
 ```
 - Provides access to state machine for external classes
-- Enables smart positioning integration
+- Enables auto-return functionality integration
 
 ## Enhanced Functionality
 
@@ -80,7 +65,7 @@ The existing intake slide reset system has been enhanced to include limit switch
 
 ## Usage Examples
 
-### 1. Basic Auto-Return (Recommended)
+### 1. Basic Auto-Return (Only change needed)
 ```java
 // Replace this:
 robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_HOLD);
@@ -89,24 +74,12 @@ robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_HOLD);
 robot.intake.setIntakeSlidePositionWithAutoReturn(IntakeConstants.SLIDE_HOLD);
 ```
 
-### 2. State Machine Integration (Teleop)
+### 2. Other positions remain unchanged
 ```java
-// For optimal performance in teleop:
-robot.intake.setIntakeSlidePositionSmart(IntakeConstants.SLIDE_HOLD);
-```
-
-### 3. Conditional Auto-Return
-```java
-// Enable auto-return only in certain conditions:
-boolean shouldAutoReturn = (currentState == RobotState.SAMPLE_INTAKE_CLOSE);
-robot.intake.setIntakeSlidePositionSmart(IntakeConstants.SLIDE_HOLD, shouldAutoReturn);
-```
-
-### 4. Autonomous Usage
-```java
-// In autonomous, use the thread-based approach:
-robot.intake.setIntakeSlidePositionWithAutoReturn(IntakeConstants.SLIDE_HOLD);
-// Slide will automatically return to min position after SLIDE_AUTO_RETURN_DELAY
+// These calls don't change:
+robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
+robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MIN);
+robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_RELEASE);
 ```
 
 ## Migration Guide
@@ -132,24 +105,12 @@ if (slideAtHoldPosition) {
 }
 ```
 
-### Step 4: Update State Machine Transitions
-For state machine transitions, consider using the smart method:
-```java
-robot.intake.setIntakeSlidePositionSmart(IntakeConstants.SLIDE_HOLD);
-```
-
 ## Configuration
 
 ### Timing Adjustment
 Modify the auto-return delay in `IntakeConstants.java`:
 ```java
 public static int SLIDE_AUTO_RETURN_DELAY = 800; // Adjust as needed
-```
-
-### Disable Auto-Return
-To disable auto-return for specific calls:
-```java
-robot.intake.setIntakeSlidePositionSmart(IntakeConstants.SLIDE_HOLD, false);
 ```
 
 ## Benefits

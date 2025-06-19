@@ -334,15 +334,30 @@ public class RobotStateMachine {
                                 null,
                                 () -> {
                                     isIntaking = true;
+                                    robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_GRAB);
                                     robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_HOLD);
                                     robot.intake.setIntakeWristPosition(IntakeConstants.WRIST_MIDDLE);
                                     robot.intake.setIntakeTurretPosition(IntakeConstants.TURRET_MIDDLE);
 
                                     robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_OUTTAKE_TRANSITION);
-                                    robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_OUTTAKE_TRANSITION_PREP);
 
                                     robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_TRANSITION);
                                     robot.outtake.setWristPosition(OuttakeConstants.WRIST_TRANSITION);
+                                },
+                                RobotState.SAMPLE_INTAKE_ELBOWS_PREP
+                        )
+                )
+        );
+
+        sampleTransitions.put(
+                RobotState.SAMPLE_INTAKE_ELBOWS_PREP,
+                Collections.singletonList(
+                        new StateTransition(
+                                RobotState.SAMPLE_INTAKE_ELBOWS_PREP,
+                                IntakeConstants.INTAKE_ELBOWS_PREP,
+                                null,
+                                () -> {
+                                    robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_OUTTAKE_TRANSITION_PREP);
                                 },
                                 RobotState.SAMPLE_INTAKE_RELEASE_ELBOWS
                         )
@@ -1176,6 +1191,7 @@ public class RobotStateMachine {
 
     /**
      * Public method to schedule intake slide auto-return from external classes
+     * Uses the existing scheduleIntakeSlideReset system
      * @param delayMs Delay in milliseconds before auto-return to minimum position
      */
     public void scheduleIntakeSlideAutoReturn(long delayMs) {
@@ -1420,8 +1436,8 @@ public class RobotStateMachine {
     private void handleSlideControls() {
         if (buttonDetector.dpadDownPressed(gamepad)) {
             if (currentState != RobotState.SAMPLE_INTAKE_CLOSE && currentState != RobotState.SAMPLE_INTAKE_CLAW_CLOSE && currentState != RobotState.SAMPLE_INTAKE_GRAB) {
-                // Use smart positioning that will auto-return to min position
-                robot.intake.setIntakeSlidePositionSmart(IntakeConstants.SLIDE_HOLD, true);
+                // Use auto-return positioning that will automatically return to min position
+                robot.intake.setIntakeSlidePositionWithAutoReturn(IntakeConstants.SLIDE_HOLD);
                 handleSlidePositionStateTransitions(true); // true = retracting
             }
         }

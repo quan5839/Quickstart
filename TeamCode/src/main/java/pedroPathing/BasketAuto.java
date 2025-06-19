@@ -37,7 +37,7 @@ import pedroPathing.util.ButtonEdgeDetector;
  * @version 2.0, 11/28/2024
  */
 
-@Autonomous(name = "Basket Aut")
+@Autonomous(name = "Basket Auto")
 public class BasketAuto extends OpMode {
 
     private Follower follower;
@@ -219,23 +219,25 @@ public class BasketAuto extends OpMode {
 
                     if(pathTimerElapsed(AutoConstants.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
                         stateMachine.changeState(RobotState.SAMPLE_INTAKE_GRAB);
-                        if (stateMachine.getCurrentState() == RobotState.SAMPLE_INTAKE_CHECK_SAMPLE){
-                            stateMachine.changeState(RobotState.SAMPLE_INTAKE_WRIST_MOVE);
-                            setPathState(9);
-                        }
+                        setPathState(3);
                     }
                 }
                 break;
             case 3:
+                if (stateMachine.getCurrentState() == RobotState.SAMPLE_INTAKE_CHECK_SAMPLE){
+                    stateMachine.changeState(RobotState.SAMPLE_INTAKE_WRIST_MOVE);
+                    setPathState(4);
+                }
+                break;
+                case 4:
                 if(stateMachine.getCurrentState() == RobotState.COMPLETE_INTAKE) {
                     robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_BASKET);
                     stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_SLIDES_EXTEND);
 
                     follower.followPath(scorePickup1,true);
-                    setPathState(4);
+                    setPathState(5);
                 }
-                break;
-            case 4:
+            case 5:
                 if(stateMachine != null && stateMachine.getCurrentState() == RobotState.SAMPLE_OUTTAKE_ELBOW_BASKET) {
                     if(pathTimerElapsed(AutoConstants.OUTTAKE_CLAW_RELEASE / 1000.0)) {
                         robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
@@ -243,12 +245,12 @@ public class BasketAuto extends OpMode {
                         if(pathTimerElapsed((AutoConstants.OUTTAKE_CLAW_RELEASE + OuttakeConstants.CLAW_CLOSED_TIME) / 1000.0)) {
                             stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_DUMP);
                             follower.followPath(grabPickup2, true);
-                            setPathState(5);
+                            setPathState(6);
                         }
                     }
                 }
                 break;
-            case 5:
+            case 6:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
                     // Start turret movement and extend slides immediately
@@ -261,14 +263,19 @@ public class BasketAuto extends OpMode {
 
                     if(pathTimerElapsed(AutoConstants.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
                         stateMachine.changeState(RobotState.SAMPLE_INTAKE_GRAB);
-                        if (stateMachine.getCurrentState() == RobotState.SAMPLE_INTAKE_CHECK_SAMPLE){
-                            stateMachine.changeState(RobotState.SAMPLE_INTAKE_WRIST_MOVE);
-                            setPathState(9);
-                        }
+                        setPathState(7);
+
                     }
                 }
                 break;
-            case 6:
+            case 7:
+                if (stateMachine.getCurrentState() == RobotState.SAMPLE_INTAKE_CHECK_SAMPLE) {
+                    stateMachine.changeState(RobotState.SAMPLE_INTAKE_WRIST_MOVE);
+                    setPathState(8);
+                }
+                break;
+
+            case 8:
                 /* Wait for intake sequence to complete, then move to score */
                 if(stateMachine.getCurrentState() == RobotState.COMPLETE_INTAKE) {
                     /* Intake complete, now go to score first sample */
@@ -276,10 +283,10 @@ public class BasketAuto extends OpMode {
                     stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_SLIDES_EXTEND);
 
                     follower.followPath(scorePickup2,true);
-                    setPathState(7);
+                    setPathState(9);
                 }
                 break;
-            case 7:
+            case 9:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the scorePose's position */
                 if(stateMachine != null && stateMachine.getCurrentState() == RobotState.SAMPLE_OUTTAKE_ELBOW_BASKET) {
                     /* Wait for claw release delay, then open claw */
@@ -288,12 +295,12 @@ public class BasketAuto extends OpMode {
                         if(pathTimerElapsed((AutoConstants.OUTTAKE_CLAW_RELEASE + OuttakeConstants.CLAW_CLOSED_TIME) / 1000.0)) {
                             stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_DUMP);
                             follower.followPath(grabPickup3, true);
-                            setPathState(8);
+                            setPathState(10);
                         }
                     }
                 }
                 break;
-            case 8:
+            case 10:
                 /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
                 if(!follower.isBusy()) {
                     // Start turret movement and extend slides immediately
@@ -307,24 +314,28 @@ public class BasketAuto extends OpMode {
 
                     if(pathTimerElapsed(AutoConstants.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
                         stateMachine.changeState(RobotState.SAMPLE_INTAKE_GRAB);
-                        if (stateMachine.getCurrentState() == RobotState.SAMPLE_INTAKE_CHECK_SAMPLE){
-                            stateMachine.changeState(RobotState.SAMPLE_INTAKE_WRIST_MOVE);
-                            setPathState(9);
-                        }
+                        setPathState(11);
                     }
                 }
                 break;
-            case 9:
+            case 11:
+                if (stateMachine.getCurrentState() == RobotState.SAMPLE_INTAKE_CHECK_SAMPLE) {
+                    stateMachine.changeState(RobotState.SAMPLE_INTAKE_WRIST_MOVE);
+                    setPathState(12);
+                }
+                break;
+
+            case 12:
                 /* Wait for intake sequence to complete, then move to score third sample */
                 if(stateMachine.getCurrentState() == RobotState.COMPLETE_INTAKE) {
                     /* Intake complete, now go to score third sample */
                     robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_BASKET);
                     stateMachine.changeState(RobotState.SAMPLE_OUTTAKE_SLIDES_EXTEND);
                     follower.followPath(scorePickup3,true);
-                    setPathState(10);
+                    setPathState(13);
                 }
                 break;
-            case 10:
+            case 13:
                 /* Final scoring - wait for outtake sequence to complete, then end */
                 if(stateMachine != null && stateMachine.getCurrentState() == RobotState.SAMPLE_OUTTAKE_ELBOW_BASKET) {
                     /* Wait for claw release delay, then open claw */
@@ -345,7 +356,7 @@ public class BasketAuto extends OpMode {
                     }
                 }
                 break;
-            case 11:
+            case 14:
                 /* Return to starting position */
                 if(!follower.isBusy()) {
                     /* Robot has returned to start position - end autonomous */
