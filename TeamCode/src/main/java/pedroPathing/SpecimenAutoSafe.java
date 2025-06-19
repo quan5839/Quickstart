@@ -260,6 +260,7 @@ public class SpecimenAutoSafe extends OpMode {
 
         switch (pathState) {
         case 0:
+            stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_PREPARE);
             robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_LIFT);
             robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_SCORE_SPECIMEN);
             robot.outtake.setWristPosition(OuttakeConstants.WRIST_SCORE_SPECIMEN);
@@ -652,6 +653,10 @@ public class SpecimenAutoSafe extends OpMode {
         // Initialize the state machine with a dummy gamepad and sample mode for autonomous
         Gamepad dummyGamepad = new Gamepad();
         stateMachine = new RobotStateMachine(robot, telemetry, dummyGamepad, RobotMode.SPECIMEN);
+        robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
+        stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_PREPARE);
+        robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
+
         stateMachine.setTeamColor(teamColor);
         stateMachine.setButtonDetector(buttonDetector); // Required for state machine validation
 

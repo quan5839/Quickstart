@@ -70,7 +70,7 @@ public class OuttakeConstants {
     public static int SLIDE_ELBOW_PREP = 1000;
 
     /** Slide lift position */
-    public static int SLIDE_LIFT = 700;
+    public static int SLIDE_LIFT = 650;
 
     /** Maximum safe extension */
     public static int SLIDE_MAX = 2150;

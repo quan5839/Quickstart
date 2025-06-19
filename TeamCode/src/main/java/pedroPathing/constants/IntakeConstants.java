@@ -19,8 +19,11 @@ public class IntakeConstants {
     /** Length from shoulder joint to elbow joint (inches) */
     public static double SHOULDER_TO_ELBOW_LENGTH_INCHES = SHOULDER_TO_ELBOW_LENGTH_MM / 25.4;
 
+    /** Length from elbow joint to claw tip (inches) - estimated based on typical FTC intake design */
+    public static double ELBOW_TO_CLAW_LENGTH_INCHES = 6.0;
+
     /** Total arm reach from shoulder pivot to claw tip (inches) */
-    public static double TOTAL_ARM_REACH_INCHES = SHOULDER_TO_ELBOW_LENGTH_INCHES;
+    public static double TOTAL_ARM_REACH_INCHES = SHOULDER_TO_ELBOW_LENGTH_INCHES + ELBOW_TO_CLAW_LENGTH_INCHES;
 
     // ========== AUTOMATIC INTAKE ==========
     
@@ -50,6 +53,20 @@ public class IntakeConstants {
     
     /** Timing constants for automatic intake sequence - wrist adjust time (ms) */
     public static int AUTO_WRIST_ADJUST_TIME = 300;
+
+    // ========== STADIUM AREA CALCULATIONS ==========
+
+    /** Slide maximum extension length (inches) - 40cm converted */
+    public static double SLIDE_LENGTH_INCHES = 15.75;
+
+    /** Shoulder joint rotation radius (inches) - 17cm converted */
+    public static double SHOULDER_RADIUS_INCHES = 6.69;
+
+    /** Enable stadium area boundary checking */
+    public static boolean ENABLE_STADIUM_AREA_CHECK = true;
+
+    /** Stadium area safety margin (inches) */
+    public static double STADIUM_SAFETY_MARGIN = 2.0;
 
     // ========== CLAW POSITIONS ==========
     

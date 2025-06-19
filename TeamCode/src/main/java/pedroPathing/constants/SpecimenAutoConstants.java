@@ -99,22 +99,22 @@ public class SpecimenAutoConstants {
     public static double PUSH_PICKUP1_CONTROL_Y = 30;
     
     /** Push pickup 1 prep control X position (inches) */
-    public static double PUSH_PICKUP1_PREP_CONTROL_X = 33;
-    
+    public static double PUSH_PICKUP1_PREP_CONTROL_X = 25;
+
     /** Push pickup 1 prep control Y position (inches) */
-    public static double PUSH_PICKUP1_PREP_CONTROL_Y = 36;
+    public static double PUSH_PICKUP1_PREP_CONTROL_Y = 34;
     
     /** Push pickup 1 prep X position (inches) */
     public static double PUSH_PICKUP1_PREP_X = 48;
     
     /** Push pickup 1 prep Y position (inches) */
-    public static double PUSH_PICKUP1_PREP_Y = 36;
+    public static double PUSH_PICKUP1_PREP_Y = 34;
     
     /** Push pickup 1 X position (inches) */
     public static double PUSH_PICKUP1_X = 48;
     
     /** Push pickup 1 Y position (inches) */
-    public static double PUSH_PICKUP1_Y = 28;
+    public static double PUSH_PICKUP1_Y = 29;
     
     /** Push pickup 2 control X position (inches) */
     public static double PUSH_PICKUP2_CONTROL_X = 62;
@@ -126,7 +126,7 @@ public class SpecimenAutoConstants {
     public static double PUSH_PICKUP2_X = 62;
     
     /** Push pickup 2 Y position (inches) */
-    public static double PUSH_PICKUP2_Y = 18;
+    public static double PUSH_PICKUP2_Y = 19;
     
     /** Push pickup 3 control X position (inches) */
     public static double PUSH_PICKUP3_CONTROL_X = 62;
@@ -138,7 +138,7 @@ public class SpecimenAutoConstants {
     public static double PUSH_PICKUP3_X = 62;
     
     /** Push pickup 3 Y position (inches) */
-    public static double PUSH_PICKUP3_Y = 8;
+    public static double PUSH_PICKUP3_Y = 9;
     
     /** Push retrieve pickup 1 Y position (inches) */
     public static double PUSH_RETRIEVE_PICKUP1_Y = 28;
@@ -204,7 +204,7 @@ public class SpecimenAutoConstants {
     public static double SCORE_PRELOAD_Y = 72;
     
     /** Score X position (inches) */
-    public static double SCORE_X = 38;
+    public static double SCORE_X = 39;
 
     // ========== START POSITIONS ==========
     

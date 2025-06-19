@@ -823,4 +823,12 @@ public abstract class BaseTeleop25152 extends OpMode {
     public RobotStateMachine getStateMachine() {
         return stateMachine;
     }
+
+    /**
+     * Get the robot hardware instance for external access
+     * @return The robot hardware
+     */
+    protected RobotHardware getRobot() {
+        return robot;
+    }
 }
