@@ -363,6 +363,7 @@ public class RobotStateMachine {
                         )
                 )
         );
+
         sampleTransitions.put(
                 RobotState.SAMPLE_INTAKE_RELEASE_ELBOWS,
                 Arrays.asList(
@@ -443,7 +444,6 @@ public class RobotStateMachine {
                                 () -> {
                                     robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_BASKET);
                                     robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_HOLD);
-                                    isIntaking = true;
                                 },
                                 RobotState.SAMPLE_OUTTAKE_SLIDES_EXTEND
                         ),
@@ -486,7 +486,6 @@ public class RobotStateMachine {
                                 () -> buttonDetector.leftBumperPressed(gamepad),
                                 () -> {
                                     robot.outtake.setClawPosition(OuttakeConstants.CLAW_OPEN);
-                                    isIntaking = false;
                                 },
                                 RobotState.SAMPLE_OUTTAKE_DUMP
                         )
@@ -1409,10 +1408,10 @@ public class RobotStateMachine {
             changeState(RobotState.INIT);
         }
 
-        // Auto-transition to HOLD when slide is retracted in specimen mode
-        if (robot.intake.getIntakeSlidePosition() <= IntakeConstants.SLIDE_MAX_EXTENSION && currentMode == RobotMode.SPECIMEN) {
-            changeState(RobotState.HOLD);
-        }
+//        // Auto-transition to HOLD when slide is retracted in specimen mode
+//        if (robot.intake.getIntakeSlidePosition() <= IntakeConstants.SLIDE_MAX_EXTENSION && currentMode == RobotMode.SPECIMEN) {
+//            changeState(RobotState.HOLD);
+//        }
 
         // Left bumper to force INIT from HOLD
         if (currentState == RobotState.HOLD && buttonDetector.leftBumperPressed(gamepad)) {
@@ -1424,14 +1423,14 @@ public class RobotStateMachine {
      * Handle mode switching between SAMPLE and SPECIMEN
      */
     private void handleModeSwitch() {
-        if (buttonDetector.startPressed(gamepad)) {
-            switchMode(currentMode == RobotMode.SAMPLE ? RobotMode.SPECIMEN : RobotMode.SAMPLE);
-        }
-
-        // Early exit if start button is held (prevents other inputs)
-        if (gamepad.start) {
-            return;
-        }
+//        if (buttonDetector.startPressed(gamepad)) {
+//            switchMode(currentMode == RobotMode.SAMPLE ? RobotMode.SPECIMEN : RobotMode.SAMPLE);
+//        }
+//
+//        // Early exit if start button is held (prevents other inputs)
+//        if (gamepad.start) {
+//            return;
+//        }
     }
 
     /**

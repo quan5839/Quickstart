@@ -15,7 +15,6 @@
 //import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 //import com.qualcomm.robotcore.hardware.Gamepad;
 //
-//import pedroPathing.constants.AutoConstants;
 //import pedroPathing.constants.FConstants;
 //import pedroPathing.constants.IntakeConstants;
 //import pedroPathing.constants.LConstants;
@@ -28,8 +27,8 @@
 //import pedroPathing.util.ButtonEdgeDetector;
 //
 ///**
-// * This is an example auto that showcases movement and control of two servos autonomously.
-// * It is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pickups 3 samples from the ground and scores them before parking.
+// * Red Alliance Specimen Auto Safe - scores specimen preload and pushes samples
+// * This is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pushes 3 samples from the ground and scores them before parking.
 // * There are examples of different ways to build paths.
 // * A path progression method has been created and can advance based on time, position, or other factors.
 // *
@@ -37,8 +36,8 @@
 // * @version 2.0, 11/28/2024
 // */
 //
-//@Autonomous(name = "Specimen Auto Risky")
-//public class SpecimenAutoRisky extends OpMode {
+//@Autonomous(name = "Blue Specimen Auto Safe", group = "Autonomous", preselectTeleOp = "Blue Specimen Teleop")
+//public class BlueSpecimenAutoSafe extends OpMode {
 //
 //    private Follower follower;
 //    private Timer pathTimer, opmodeTimer;
@@ -48,22 +47,9 @@
 //    private RobotStateMachine stateMachine;
 //    private ButtonEdgeDetector buttonDetector = new ButtonEdgeDetector();
 //
-//    // Team color for autonomous
-//    public enum TeamColor {
-//        RED(Color.RED, "Red Alliance"),
-//        BLUE(Color.BLUE, "Blue Alliance");
-//
-//        public final int hubColor;
-//        public final String displayName;
-//
-//        TeamColor(int hubColor, String displayName) {
-//            this.hubColor = hubColor;
-//            this.displayName = displayName;
-//        }
-//    }
-//
-//    // Set team color for this autonomous (change as needed)
-//    private final TeamColor teamColor = TeamColor.BLUE;
+//    // Red Alliance team color (hard-coded for this auto)
+//    private final int teamColor = Color.BLUE;
+//    private final String teamColorName = "Blue Alliance";
 //
 //    /** This is the variable where we store the state of our auto.
 //     * It is used by the pathUpdate method. */
@@ -87,23 +73,31 @@
 //    /** Scoring Pose of our robot. It is facing the submersible at a -45 degree (315 degree) angle. */
 //    private final Pose scorePreLoadPose = new Pose(SpecimenAutoConstants.SCORE_X, SpecimenAutoConstants.SCORE_PRELOAD_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 //
+//    private final Pose pushPickup1PrepPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP1_PREP_X, SpecimenAutoConstants.PUSH_PICKUP1_PREP_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
+//
+//    private final Pose pushPickup1PrepControlPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP1_PREP_CONTROL_X, SpecimenAutoConstants.PUSH_PICKUP1_PREP_CONTROL_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
+//
 //    /** Lowest (First) Sample from the Spike Mark */
-//    private final Pose pickup1Pose = new Pose(SpecimenAutoConstants.GRAB_PICKUP1_X, SpecimenAutoConstants.GRAB_PICKUP1_Y, Math.toRadians(SpecimenAutoConstants.PICKUP1_HEADING_DEG));
+//    private final Pose pushPickup1Pose = new Pose(SpecimenAutoConstants.PUSH_PICKUP1_X, SpecimenAutoConstants.PUSH_PICKUP1_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 //
-//    private final Pose pickup1ControlPose = new Pose(SpecimenAutoConstants.GRAB_PICKUP1_CONTROL_X, SpecimenAutoConstants.GRAB_PICKUP1_CONTROL_Y);
+//    private final Pose pushPickup1ControlPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP1_CONTROL_X, SpecimenAutoConstants.PUSH_PICKUP1_CONTROL_Y);
 //
-//    private final Pose retrieve1Pose = new Pose(SpecimenAutoConstants.GRAB_PICKUP1_X, SpecimenAutoConstants.GRAB_PICKUP1_Y, Math.toRadians(SpecimenAutoConstants.RETRIEVE_HEADING_DEG));
+//    private final Pose pushRetrieve1Pose = new Pose(SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP1_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 //
 //    /** Middle (Second) Sample from the Spike Mark */
-//    private final Pose pickup2Pose = new Pose(SpecimenAutoConstants.GRAB_PICKUP2_X, SpecimenAutoConstants.GRAB_PICKUP2_Y, Math.toRadians(SpecimenAutoConstants.PICKUP2_HEADING_DEG));
+//    private final Pose pushPickup2Pose = new Pose(SpecimenAutoConstants.PUSH_PICKUP2_X, SpecimenAutoConstants.PUSH_PICKUP2_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 //
-//    private final Pose retrieve2Pose = new Pose(SpecimenAutoConstants.GRAB_PICKUP2_X, SpecimenAutoConstants.GRAB_PICKUP2_Y, Math.toRadians(SpecimenAutoConstants.RETRIEVE_HEADING_DEG));
+//    private final Pose pushPickup2ControlPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP2_CONTROL_X, SpecimenAutoConstants.PUSH_PICKUP2_CONTROL_Y);
+//
+//    private final Pose retrieve2Pose = new Pose(SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP2_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 //
 //
 //    /** Highest (Third) Sample from the Spike Mark */
-//    private final Pose pickup3Pose = new Pose(SpecimenAutoConstants.GRAB_PICKUP3_X, SpecimenAutoConstants.GRAB_PICKUP3_Y, Math.toRadians(SpecimenAutoConstants.PICKUP3_HEADING_DEG));
+//    private final Pose pushPickup3Pose = new Pose(SpecimenAutoConstants.PUSH_PICKUP3_X, SpecimenAutoConstants.PUSH_PICKUP3_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 //
-//    private final Pose retrieve3Pose = new Pose(SpecimenAutoConstants.GRAB_PICKUP3_X, SpecimenAutoConstants.GRAB_PICKUP3_Y, Math.toRadians(SpecimenAutoConstants.RETRIEVE_HEADING_DEG));
+//    private final Pose pushPickup3ControlPose = new Pose(SpecimenAutoConstants.PUSH_PICKUP3_CONTROL_X, SpecimenAutoConstants.PUSH_PICKUP3_CONTROL_Y);
+//
+//    private final Pose retrieve3Pose = new Pose(SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP_X, SpecimenAutoConstants.PUSH_RETRIEVE_PICKUP3_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 //
 //    private final Pose prepGrabSpecimenPose = new Pose(SpecimenAutoConstants.PREP_GRAB_SPECIMEN_X, SpecimenAutoConstants.PREP_AND_GRAB_SPECIMEN_Y, Math.toRadians(SpecimenAutoConstants.GRAB_SCORE_HEADING_DEG));
 //    private final Pose prepGrabSpecimenPoseControl1 = new Pose(SpecimenAutoConstants.PREP_GRAB_SPECIMEN_CONTROL_X_1, SpecimenAutoConstants.PREP_GRAB_SPECIMEN_CONTROL_Y_1);
@@ -127,7 +121,7 @@
 //
 //    /* These are our Paths and PathChains that we will define in buildPaths() */
 //    private Path scorePreload, park, returnToStart;
-//    private PathChain grabPickup1, grabPickup2, grabPickup3,
+//    private PathChain pushPickup1Prep, pushPickup1, pushPickup2, pushPickup3,
 //            retrievePickup1, retrievePickup2, retrievePickup3,
 //            prepGrabSpecimen1, prepGrabSpecimen2, prepGrabSpecimen3, prepGrabSpecimen4,
 //            scoreSpecimen1, scoreSpecimen2, scoreSpecimen3, scoreSpecimen4,
@@ -156,35 +150,37 @@
 //        scorePreload = new Path(new BezierLine(new Point(startPose), new Point(scorePreLoadPose)));
 //        scorePreload.setLinearHeadingInterpolation(startPose.getHeading(), scorePreLoadPose.getHeading());
 //
-//        /* Here is an example for Constant Interpolation
-//        scorePreload.setConstantInterpolation(startPose.getHeading()); */
+//        // Push pickup 1 sequence: prep -> push -> retrieve
+//        Path pushPickup1PrepPath = new Path(new BezierCurve(new Point(scorePreLoadPose), new Point(pushPickup1PrepControlPose), new Point(pushPickup1PrepPose)));
+//        pushPickup1PrepPath.setLinearHeadingInterpolation(scorePreLoadPose.getHeading(), pushPickup1PrepPose.getHeading());
+//        pushPickup1Prep = new PathChain(pushPickup1PrepPath);
 //
-//        Path grabPickup1Path = new Path(new BezierCurve(new Point(scorePreLoadPose), new Point(pickup1ControlPose), new Point(pickup1Pose)));
-//        grabPickup1Path.setLinearHeadingInterpolation(scorePreLoadPose.getHeading(), pickup1Pose.getHeading());
-//        grabPickup1 = new PathChain(grabPickup1Path);
+//        Path pushPickup1Path = new Path(new BezierCurve(new Point(pushPickup1PrepPose), new Point(pushPickup1ControlPose), new Point(pushPickup1Pose)));
+//        pushPickup1Path.setLinearHeadingInterpolation(pushPickup1PrepPose.getHeading(), pushPickup1Pose.getHeading());
+//        pushPickup1 = new PathChain(pushPickup1Path);
 //
-//        Path retrivePickup1Path = new Path(new BezierLine(new Point(pickup1Pose), new Point(retrieve1Pose)));
-//        retrivePickup1Path.setLinearHeadingInterpolation(pickup1Pose.getHeading(), retrieve1Pose.getHeading());
+//        Path retrivePickup1Path = new Path(new BezierLine(new Point(pushPickup1Pose), new Point(pushRetrieve1Pose)));
+//        retrivePickup1Path.setLinearHeadingInterpolation(pushPickup1Pose.getHeading(), pushRetrieve1Pose.getHeading());
 //        retrievePickup1 = new PathChain(retrivePickup1Path);
 //
 //
 //
-//        Path grabPickup2Path = new Path(new BezierLine(new Point(retrieve1Pose), new Point(pickup2Pose)));
-//        grabPickup2Path.setLinearHeadingInterpolation(retrieve1Pose.getHeading(), pickup2Pose.getHeading());
-//        grabPickup2 = new PathChain(grabPickup2Path);
+//        Path pushPickup2Path = new Path(new BezierCurve(new Point(pushRetrieve1Pose), new Point(pushPickup2ControlPose), new Point(pushPickup2Pose)));
+//        pushPickup2Path.setLinearHeadingInterpolation(pushRetrieve1Pose.getHeading(), pushPickup2Pose.getHeading());
+//        pushPickup2 = new PathChain(pushPickup2Path);
 //
-//        Path retrivePickup2Path = new Path(new BezierLine(new Point(pickup2Pose), new Point(retrieve2Pose)));
-//        retrivePickup2Path.setLinearHeadingInterpolation(pickup2Pose.getHeading(), retrieve2Pose.getHeading());
+//        Path retrivePickup2Path = new Path(new BezierLine(new Point(pushPickup2Pose), new Point(retrieve2Pose)));
+//        retrivePickup2Path.setLinearHeadingInterpolation(pushPickup2Pose.getHeading(), retrieve2Pose.getHeading());
 //        retrievePickup2 = new PathChain(retrivePickup2Path);
 //
 //
 //
-//        Path grabPickup3Path = new Path(new BezierLine(new Point(retrieve2Pose), new Point(pickup3Pose)));
-//        grabPickup3Path.setLinearHeadingInterpolation(retrieve2Pose.getHeading(), pickup3Pose.getHeading());
-//        grabPickup3 = new PathChain(grabPickup3Path);
+//        Path pushPickup3Path = new Path(new BezierCurve(new Point(retrieve2Pose), new Point(pushPickup3ControlPose), new Point(pushPickup3Pose)));
+//        pushPickup3Path.setLinearHeadingInterpolation(retrieve2Pose.getHeading(), pushPickup3Pose.getHeading());
+//        pushPickup3 = new PathChain(pushPickup3Path);
 //
-//        Path retrivePickup3Path = new Path(new BezierLine(new Point(pickup3Pose), new Point(retrieve3Pose)));
-//        retrivePickup3Path.setLinearHeadingInterpolation(pickup3Pose.getHeading(), retrieve3Pose.getHeading());
+//        Path retrivePickup3Path = new Path(new BezierLine(new Point(pushPickup3Pose), new Point(retrieve3Pose)));
+//        retrivePickup3Path.setLinearHeadingInterpolation(pushPickup3Pose.getHeading(), retrieve3Pose.getHeading());
 //        retrievePickup3 = new PathChain(retrivePickup3Path);
 //
 //
@@ -250,264 +246,210 @@
 //        }
 //
 //        switch (pathState) {
-//        case 0:
-//            robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_LIFT);
-//            robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_SCORE_SPECIMEN);
-//            robot.outtake.setWristPosition(OuttakeConstants.WRIST_SCORE_SPECIMEN);
-//            follower.followPath(scorePreload);
-//            setPathState(1);
-//            break;
+//            case 0:
+//                stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_PREPARE);
+//                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_LIFT);
+//                robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_SCORE_SPECIMEN);
+//                robot.outtake.setWristPosition(OuttakeConstants.WRIST_SCORE_SPECIMEN);
+//                follower.followPath(scorePreload);
+//                setPathState(1);
+//                break;
 //
-//        case 1:
-//            if(!follower.isBusy()) {
-//                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
-//                stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
-//                setPathState(2);
-//            }
-//            break;
-//        case 2:
-//            if(stateMachine.getCurrentState() == RobotState.INIT) {
-//                // Reset outtake slide to minimum position after specimen release
-//                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
-//                stateMachine.changeState(RobotState.HOLD);
-//                follower.followPath(grabPickup1, true);
-//                setPathState(3);
-//            }
+//            case 1:
+//                if(!follower.isBusy()) {
+//                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
+//                    stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
+//                    setPathState(2);
+//                }
+//                break;
+//            case 2:
+//                if(stateMachine.getCurrentState() == RobotState.INIT) {
+//                    // Reset outtake slide to minimum position after specimen release
+//                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_MIN);
+//                    stateMachine.changeState(RobotState.HOLD);
+//                    follower.followPath(pushPickup1Prep, true);
+//                    setPathState(3);
+//                }
 //
-//            break;
-//        case 3:
-//            if(!follower.isBusy()) {
-//                // Start turret movement and extend slides immediately
-//                rotateTurret(SpecimenAutoConstants.SAMPLE1_TURRET_POS);
-//                rotateClawWrist(SpecimenAutoConstants.SAMPLE1_WRIST_POS);
-//                robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
-//                robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
-//                robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
-//
-//                if (pathTimerElapsed(AutoConstants.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
-//                    stateMachine.changeExternalState(RobotState.SPECIMEN_INTAKE_GRAB);
+//                break;
+//            case 3:
+//                if(!follower.isBusy()) {
+//                    // Move to push position for sample 1
+//                    follower.followPath(pushPickup1, false);
 //                    setPathState(4);
 //                }
-//
-//            }
-//            break;
-//        case 4:
-//            if (stateMachine.getCurrentState() == RobotState.SPECIMEN_INTAKE_CHECK_SAMPLE){
-//                robot.intake.setIntakeTurretPosition(SpecimenAutoConstants.RETRIEVE_SAMPLE_TURRET_POS);
-//                robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_REMOVE);
-//                robot.intake.setIntakeElbowPosition(IntakeConstants.SHOULDER_REMOVE);
-//                follower.followPath(retrievePickup1, true);
-//                setPathState(5);
-//            }
-//            break;
-//
-//        case 5:
-//            if (!follower.isBusy()){
-//                robot.intake.setIntakeClawPosition(IntakeConstants.CLAW_OPEN);
-//                if (pathTimerElapsed((double) IntakeConstants.CLAW_CLOSED_TIME / 1000)){
-//                    follower.followPath(grabPickup2);
+//                break;
+//            case 4:
+//                if (!follower.isBusy()){
+//                    // Push sample 1 into pickup area - no intake operations needed
+//                    follower.followPath(retrievePickup1, false);
+//                    setPathState(5);
+//                }
+//                break;
+//            case 5:
+//                if (!follower.isBusy()){
+//                    // Move to push sample 2
+//                    follower.followPath(pushPickup2, false);
 //                    setPathState(6);
 //                }
-//            }
-//            break;
+//                break;
 //
-//        case 6:
-//            /* This case checks the robot's position and will wait until the robot position is close (1 inch away) from the pickup1Pose's position */
-//            if(!follower.isBusy()) {
-//                // Start turret movement and extend slides immediately
-//                rotateTurret(SpecimenAutoConstants.SAMPLE2_TURRET_POS);
-//                rotateClawWrist(SpecimenAutoConstants.SAMPLE2_WRIST_POS);
-//                robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
-//                robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
-//                robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
-//
-//                if (pathTimerElapsed(AutoConstants.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
-//                    stateMachine.changeExternalState(RobotState.SPECIMEN_INTAKE_GRAB);
+//            case 6:
+//                if(!follower.isBusy()) {
+//                    // Push sample 2 into pickup area - no intake operations needed
+//                    follower.followPath(retrievePickup2, false);
 //                    setPathState(7);
 //                }
-//            }
-//            break;
-//        case 7:
-//            if (stateMachine.getCurrentState() == RobotState.SPECIMEN_INTAKE_CHECK_SAMPLE){
-//                robot.intake.setIntakeTurretPosition(SpecimenAutoConstants.RETRIEVE_SAMPLE_TURRET_POS);
-//                robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_REMOVE);
-//                robot.intake.setIntakeElbowPosition(IntakeConstants.SHOULDER_REMOVE);
-//                follower.followPath(retrievePickup2, true);
-//                setPathState(8);
-//            }
-//            break;
-//        case 8:
-//            if (!follower.isBusy()){
-//                robot.intake.setIntakeClawPosition(IntakeConstants.CLAW_OPEN);
-//                if (pathTimerElapsed((double) IntakeConstants.CLAW_CLOSED_TIME / 1000)){
-//                    follower.followPath(grabPickup3);
+//                break;
+//            case 7:
+//                if (!follower.isBusy()){
+//                    // Move to push sample 3
+//                    follower.followPath(pushPickup3, false);
+//                    setPathState(8);
+//                }
+//                break;
+//            case 8:
+//                if(!follower.isBusy()) {
+//                    // Push sample 3 into pickup area - no intake operations needed
+//                    follower.followPath(retrievePickup3, false);
 //                    setPathState(9);
 //                }
-//            }
-//            break;
-//        case 9:
-//            if(!follower.isBusy()) {
-//                // Start turret movement and extend slides immediately
-//                rotateTurret(SpecimenAutoConstants.SAMPLE3_TURRET_POS);
-//                rotateClawWrist(SpecimenAutoConstants.SAMPLE3_WRIST_POS);
-//                robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
-//                robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_PREP);
-//                robot.intake.setIntakeElbowPosition(IntakeConstants.ELBOW_PREP);
-//
-//                if (pathTimerElapsed(AutoConstants.INTAKE_SLIDE_WAIT_TIME / 1000.0)) {
-//                    stateMachine.changeExternalState(RobotState.SPECIMEN_INTAKE_GRAB);
-//                    setPathState(10);
-//                }
-//            }
-//            break;
-//        case 10:
-//            if (stateMachine.getCurrentState() == RobotState.SPECIMEN_INTAKE_CHECK_SAMPLE){
-//                robot.intake.setIntakeTurretPosition(SpecimenAutoConstants.RETRIEVE_SAMPLE_TURRET_POS);
-//                robot.intake.setIntakeShoulderPosition(IntakeConstants.SHOULDER_REMOVE);
-//                robot.intake.setIntakeElbowPosition(IntakeConstants.SHOULDER_REMOVE);
-//                follower.followPath(retrievePickup3, true);
-//                setPathState(11);
-//            }
-//            break;
-//
-//        case 11:
-//            if (!follower.isBusy()){
-//                robot.intake.setIntakeClawPosition(IntakeConstants.CLAW_OPEN);
-//                if (pathTimerElapsed((double) IntakeConstants.CLAW_CLOSED_TIME / 1000)){
-//                    robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_HOLD);
+//                break;
+//            case 9:
+//                if (!follower.isBusy()){
+//                    // All samples pushed, now prepare to grab first specimen
 //                    stateMachine.changeState(RobotState.INIT);
 //                    follower.followPath(prepGrabSpecimen1);
-//                    setPathState(12);
+//                    setPathState(10);
 //                }
-//            }
-//            break;
+//                break;
 //
-//        case 12:
-//            if (!follower.isBusy()){
-//                follower.followPath(grabSpecimen);
-//                setPathState(13);
-//            }
-//            break;
-//
-//        case 13:
-//            if (!follower.isBusy()){
-//                robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
-//                if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
-//                    follower.followPath(scoreSpecimen1);
-//                    setPathState(14);
+//            case 10:
+//                if (!follower.isBusy()){
+//                    follower.followPath(grabSpecimen);
+//                    setPathState(11);
 //                }
-//            }
-//            break;
-//        case 14:
-//            if(!follower.isBusy()) {
-//                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
-//                stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
-//                setPathState(15);
-//            }
-//            break;
-//        case 15:
+//                break;
+//
+//            case 11:
+//                if (!follower.isBusy()){
+//                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
+//                    if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
+//                        follower.followPath(scoreSpecimen1);
+//                        setPathState(12);
+//                    }
+//                }
+//                break;
+//            case 12:
+//                if(!follower.isBusy()) {
+//                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
+//                    stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
+//                    setPathState(13);
+//                }
+//                break;
+//            case 13:
 //                if(stateMachine.getCurrentState() == RobotState.INIT) {
 //                    follower.followPath(prepGrabSpecimen2, true);
-//                    setPathState(16);
+//                    setPathState(14);
 //                }
-//            break;
-//        case 16:
+//                break;
+//            case 14:
 //                if(!follower.isBusy()) {
 //                    follower.followPath(grabSpecimen, true);
+//                    setPathState(15);
+//                }
+//                break;
+//
+//            case 15:
+//                if (!follower.isBusy()){
+//                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
+//                    if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
+//                        follower.followPath(scoreSpecimen2);
+//                        setPathState(16);
+//                    }
+//                }
+//                break;
+//            case 16:
+//                if(!follower.isBusy()) {
+//                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
+//                    stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
 //                    setPathState(17);
 //                }
-//            break;
-//
-//        case 17:
-//            if (!follower.isBusy()){
-//                robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
-//                if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
-//                    follower.followPath(scoreSpecimen2);
+//                break;
+//            case 17:
+//                if(stateMachine.getCurrentState() == RobotState.INIT) {
+//                    follower.followPath(prepGrabSpecimen3, true);
 //                    setPathState(18);
 //                }
-//            }
-//            break;
-//        case 18:
-//            if(!follower.isBusy()) {
-//                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
-//                stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
-//                setPathState(19);
-//            }
-//            break;
-//        case 19:
-//            if(stateMachine.getCurrentState() == RobotState.INIT) {
-//                follower.followPath(prepGrabSpecimen3, true);
-//                setPathState(20);
-//            }
-//            break;
+//                break;
 //
-//        case 20:
-//            if(!follower.isBusy()) {
-//                follower.followPath(grabSpecimen, true);
-//                setPathState(21);
-//            }
-//            break;
+//            case 18:
+//                if(!follower.isBusy()) {
+//                    follower.followPath(grabSpecimen, true);
+//                    setPathState(19);
+//                }
+//                break;
 //
-//        case 21:
-//            if (!follower.isBusy()){
-//                robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
-//                if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
-//                    follower.followPath(scoreSpecimen3);
+//            case 19:
+//                if (!follower.isBusy()){
+//                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
+//                    if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
+//                        follower.followPath(scoreSpecimen3);
+//                        setPathState(20);
+//                    }
+//                }
+//                break;
+//            case 20:
+//                if(!follower.isBusy()) {
+//                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
+//                    stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
+//                    setPathState(21);
+//                }
+//                break;
+//            case 21:
+//                if(stateMachine.getCurrentState() == RobotState.INIT) {
+//                    follower.followPath(prepGrabSpecimen4, true);
 //                    setPathState(22);
 //                }
-//            }
-//            break;
-//        case 22:
-//            if(!follower.isBusy()) {
-//                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
-//                stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
-//                setPathState(23);
-//            }
-//            break;
-//        case 23:
-//            if(stateMachine.getCurrentState() == RobotState.INIT) {
-//                follower.followPath(prepGrabSpecimen4, true);
-//                setPathState(24);
-//            }
-//            break;
+//                break;
 //
-//        case 24:
-//            if(!follower.isBusy()) {
-//                follower.followPath(grabSpecimen, true);
-//                setPathState(25);
-//            }
-//            break;
+//            case 22:
+//                if(!follower.isBusy()) {
+//                    follower.followPath(grabSpecimen, true);
+//                    setPathState(23);
+//                }
+//                break;
 //
-//        case 25:
-//            if (!follower.isBusy()){
-//                robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
-//                if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
-//                    follower.followPath(scoreSpecimen4);
+//            case 23:
+//                if (!follower.isBusy()){
+//                    robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
+//                    if (stateMachine.getCurrentState() == RobotState.SPECIMEN_OUTTAKE_CHECK) {
+//                        follower.followPath(scoreSpecimen4);
+//                        setPathState(24);
+//                    }
+//                }
+//                break;
+//            case 24:
+//                if(!follower.isBusy()) {
+//                    robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
+//                    stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
+//                    setPathState(25);
+//                }
+//                break;
+//
+//            case 25:
+//                if(stateMachine.getCurrentState() == RobotState.INIT) {
+//                    follower.followPath(park);
 //                    setPathState(26);
 //                }
-//            }
-//            break;
-//        case 26:
-//            if(!follower.isBusy()) {
-//                robot.outtake.setSlidePosition(OuttakeConstants.SLIDE_SCORE);
-//                stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_RELEASE);
-//                setPathState(27);
-//            }
-//            break;
+//                break;
 //
-//        case 27:
-//            if(stateMachine.getCurrentState() == RobotState.INIT) {
-//                follower.followPath(park);
-//                setPathState(28);
-//            }
-//            break;
-//
-//        case 28:
-//            if (!follower.isBusy()){
-//                robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
-//                setPathState(-1);
-//            }
-//            break;
+//            case 26:
+//                if (!follower.isBusy()){
+//                    robot.intake.setIntakeSlidePosition(IntakeConstants.SLIDE_MAX);
+//                    setPathState(-1);
+//                }
+//                break;
 //        }
 //
 //
@@ -655,7 +597,7 @@
 //            if(follower != null) {
 //                try {
 //                    telemetry.addData("Position", "X: %.1f, Y: %.1f",
-//                        follower.getPose().getX(), follower.getPose().getY());
+//                            follower.getPose().getX(), follower.getPose().getY());
 //                    telemetry.addData("Heading", "%.1f°", Math.toDegrees(follower.getPose().getHeading()));
 //                    telemetry.addData("Follower Busy", follower.isBusy());
 //                } catch (Exception followerEx) {
@@ -700,6 +642,10 @@
 //        // Initialize the state machine with a dummy gamepad and sample mode for autonomous
 //        Gamepad dummyGamepad = new Gamepad();
 //        stateMachine = new RobotStateMachine(robot, telemetry, dummyGamepad, RobotMode.SPECIMEN);
+//        robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
+//        stateMachine.changeState(RobotState.SPECIMEN_OUTTAKE_PREPARE);
+//        robot.outtake.setClawPosition(OuttakeConstants.CLAW_CLOSED);
+//
 //        stateMachine.setTeamColor(teamColor);
 //        stateMachine.setButtonDetector(buttonDetector); // Required for state machine validation
 //
@@ -711,7 +657,7 @@
 //        buildPaths();
 //
 //        telemetry.addData("Status", "Hardware Initialized");
-//        telemetry.addData("Team Color", teamColor.displayName);
+//        telemetry.addData("Team Color", teamColorName);
 //        telemetry.update();
 //    }
 //

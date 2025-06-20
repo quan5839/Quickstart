@@ -27,7 +27,7 @@ public class OuttakeConstants {
     public static double ELBOW_BASE = 0.0;
 
     /** Elbow basket position */
-    public static double ELBOW_BASKET = 0.7;
+    public static double ELBOW_BASKET = 0.55;
 
     /** Elbow get specimen position */
     public static double ELBOW_GET_SPECIMEN = 0.98;
@@ -43,6 +43,11 @@ public class OuttakeConstants {
 
     /** Elbow transition position */
     public static double ELBOW_TRANSITION = 0.27;
+
+
+    public static double ELBOW_PARK = 0.64;
+
+
 
     // ========== SLIDE CONTROL ==========
 
@@ -64,7 +69,7 @@ public class OuttakeConstants {
     // ========== SLIDE POSITIONS ==========
 
     /** Slide basket position */
-    public static int SLIDE_BASKET = 2150;
+    public static int SLIDE_BASKET = 2000;
 
     /** Slide elbow prep position */
     public static int SLIDE_ELBOW_PREP = 1000;

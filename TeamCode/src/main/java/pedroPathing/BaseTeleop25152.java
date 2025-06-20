@@ -4,9 +4,7 @@ import android.graphics.Color;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
-import com.pedropathing.util.Constants;
+import com.pedropathing.localization.constants.PinpointConstants;
 import com.qualcomm.hardware.bosch.BHI260IMU;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -15,15 +13,15 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 import java.util.Locale;
 
 import pedroPathing.constants.ControlConstants;
-import pedroPathing.constants.FConstants;
 import pedroPathing.constants.IntakeConstants;
-import pedroPathing.constants.LConstants;
 import pedroPathing.hardware.DriveSystem.Orientation;
+import pedroPathing.hardware.GoBildaPinpointDriver;
 import pedroPathing.hardware.RobotHardware;
 import pedroPathing.hardware.SampleColor;
 import pedroPathing.robot_state.RobotMode;
@@ -40,12 +38,9 @@ import pedroPathing.util.PerformanceMonitor;
  */
 public abstract class BaseTeleop25152 extends OpMode {
 
-    //TODO: Export and Import robot config file
-    // adb pull /sdcard/FIRST/config.xml
-    // adb push config.xml /sdcard/FIRST/config.xml
 
-    private Follower follower;
-    private final Pose startPose = new Pose(0, 0, 0);
+//    private Follower follower;
+//    private final Pose startPose = new Pose(0, 0, 0);
     private final RobotHardware robot = new RobotHardware(this);
     private RobotStateMachine stateMachine;
 
@@ -56,7 +51,8 @@ public abstract class BaseTeleop25152 extends OpMode {
     private long lastUpdateTime = System.currentTimeMillis();
 
     // IMU support - Pinpoint with REV fallback
-    private Object imu; // Will be either GoBildaPinpointDriver or BHI260IMU
+    private GoBildaPinpointDriver pinpointIMU;
+    private BHI260IMU revIMU;
     private boolean usingPinpointIMU = false;
 
     // Color recognition control
@@ -114,19 +110,19 @@ public abstract class BaseTeleop25152 extends OpMode {
     @Override
     public void init() {
         // Check for pose transfer from AUTO_POSE SharedPreferences
-        android.content.SharedPreferences prefs = hardwareMap.appContext.getSharedPreferences("AUTO_POSE", 0);
-        boolean hasPose = prefs.contains("x") && prefs.contains("y") && prefs.contains("heading");
-        Pose teleopStartPose;
-        if (hasPose) {
-            float ax = prefs.getFloat("x", 0);
-            float ay = prefs.getFloat("y", 0);
-            float ah = prefs.getFloat("heading", 0);
-            teleopStartPose = new Pose(ax, ay, ah);
-        } else {
-            teleopStartPose = startPose;
-        }
+//        android.content.SharedPreferences prefs = hardwareMap.appContext.getSharedPreferences("AUTO_POSE", 0);
+//        boolean hasPose = prefs.contains("x") && prefs.contains("y") && prefs.contains("heading");
+//        Pose teleopStartPose;
+//        if (hasPose) {
+//            float ax = prefs.getFloat("x", 0);
+//            float ay = prefs.getFloat("y", 0);
+//            float ah = prefs.getFloat("heading", 0);
+//            teleopStartPose = new Pose(ax, ay, ah);
+//        } else {
+//            teleopStartPose = startPose;
+//        }
         // Remove keys after reading so they're not reused again
-        prefs.edit().remove("x").remove("y").remove("heading").apply();
+//        prefs.edit().remove("x").remove("y").remove("heading").apply();
 
         // Initialize the robot hardware
         robot.init();
@@ -143,9 +139,9 @@ public abstract class BaseTeleop25152 extends OpMode {
         initializeIMU();
 
         // Initialize the follower with (possibly transferred) starting pose
-        Constants.setConstants(FConstants.class, LConstants.class);
-        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
-        follower.setStartingPose(teleopStartPose);
+//        Constants.setConstants(FConstants.class, LConstants.class);
+//        follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
+//        follower.setStartingPose(teleopStartPose);
 
         // Performance optimization: Cache hardware queries and enable bulk reading
         cachedHubs = hardwareMap.getAll(LynxModule.class);
@@ -160,7 +156,7 @@ public abstract class BaseTeleop25152 extends OpMode {
             hub.setConstant(getTeamColor().hubColor);
         }
 
-        telemetry.addData("Start Pose", String.format(Locale.US, "%.2f, %.2f, %.1f°", teleopStartPose.getX(), teleopStartPose.getY(), Math.toDegrees(teleopStartPose.getHeading())));
+//        telemetry.addData("Start Pose", String.format(Locale.US, "%.2f, %.2f, %.1f°", teleopStartPose.getX(), teleopStartPose.getY(), Math.toDegrees(teleopStartPose.getHeading())));
         telemetry.addData("Team Color", getTeamColor().displayName);
         telemetry.addData("Robot Mode", getRobotMode().toString());
         telemetry.addData("Bulk Reading", "ENABLED");
@@ -171,7 +167,7 @@ public abstract class BaseTeleop25152 extends OpMode {
     /** This method is called once at the start of the OpMode. **/
     @Override
     public void start() {
-        follower.startTeleopDrive();
+//        follower.startTeleopDrive();
     }
 
     /** This is the main loop of the opmode and runs continuously after play **/
@@ -720,31 +716,48 @@ public abstract class BaseTeleop25152 extends OpMode {
 
     /**
      * Initialize IMU - Try Pinpoint first, fallback to REV IMU
+     * Uses proper GoBildaPinpointDriver without reflection and does not reset during init
      */
     private void initializeIMU() {
         try {
-            // Try to initialize Pinpoint IMU first
-            // Using reflection to avoid compile-time dependency on Pinpoint driver
-            Class<?> pinpointClass = Class.forName("com.qualcomm.hardware.gobilda.GoBildaPinpointDriver");
-            imu = hardwareMap.get(pinpointClass, "pinpoint");
+            // Try to initialize Pinpoint IMU first using proper driver
+            pinpointIMU = hardwareMap.get(GoBildaPinpointDriver.class, "pinpoint");
 
-            // Initialize Pinpoint IMU
-            // pinpoint.setOffsets(-84.0, -168.0); // Example offsets - adjust for your robot
-            // pinpoint.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-            // pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-            // pinpoint.resetPosAndIMU();
+            // Configure Pinpoint IMU using constants from PinpointConstants
+            // Set offsets from PinpointConstants
+            pinpointIMU.setOffsets(
+                PinpointConstants.strafeX,
+                PinpointConstants.forwardY,
+                PinpointConstants.distanceUnit
+            );
 
-            // Use reflection to call methods
-            java.lang.reflect.Method resetMethod = pinpointClass.getMethod("resetPosAndIMU");
-            resetMethod.invoke(imu);
+            // Set encoder resolution from PinpointConstants
+            if (PinpointConstants.useCustomEncoderResolution) {
+                pinpointIMU.setEncoderResolution(
+                    PinpointConstants.customEncoderResolution,
+                    DistanceUnit.MM
+                );
+            } else {
+                // Use the local GoBildaPinpointDriver enum instead of PedroPathing library enum
+                pinpointIMU.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+            }
+
+            // Set encoder directions from PinpointConstants using local GoBildaPinpointDriver enums
+            pinpointIMU.setEncoderDirections(
+                GoBildaPinpointDriver.EncoderDirection.FORWARD,
+                GoBildaPinpointDriver.EncoderDirection.REVERSED
+            );
+
+            // Do NOT reset during initialization as requested by user
+            // pinpointIMU.resetPosAndIMU(); // Removed as per user request
 
             usingPinpointIMU = true;
-            telemetry.addData("IMU", "Pinpoint IMU initialized successfully");
+            telemetry.addData("IMU", "Pinpoint IMU initialized successfully (no reset)");
 
         } catch (Exception e) {
             // Fallback to REV IMU
             try {
-                BHI260IMU revIMU = hardwareMap.get(BHI260IMU.class, "imu");
+                revIMU = hardwareMap.get(BHI260IMU.class, "imu");
                 BHI260IMU.Parameters imuParameters = new BHI260IMU.Parameters(
                         new RevHubOrientationOnRobot(
                                 RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
@@ -752,15 +765,14 @@ public abstract class BaseTeleop25152 extends OpMode {
                         )
                 );
                 revIMU.initialize(imuParameters);
-                revIMU.resetYaw();
 
-                imu = revIMU;
                 usingPinpointIMU = false;
                 telemetry.addData("IMU", "REV IMU initialized (Pinpoint not available)");
 
             } catch (Exception revError) {
                 telemetry.addData("ERROR", "Failed to initialize any IMU: " + revError.getMessage());
-                imu = null;
+                pinpointIMU = null;
+                revIMU = null;
                 usingPinpointIMU = false;
             }
         }
@@ -771,17 +783,13 @@ public abstract class BaseTeleop25152 extends OpMode {
      * Reset IMU yaw for both Pinpoint and REV IMU
      */
     private void resetIMUYaw() {
-        if (imu == null) return;
-
         try {
-            if (usingPinpointIMU) {
-                // Reset Pinpoint IMU using reflection
-                Class<?> pinpointClass = imu.getClass();
-                java.lang.reflect.Method resetMethod = pinpointClass.getMethod("resetPosAndIMU");
-                resetMethod.invoke(imu);
-            } else {
+            if (usingPinpointIMU && pinpointIMU != null) {
+                // Reset Pinpoint IMU using proper driver method
+                pinpointIMU.resetPosAndIMU();
+            } else if (!usingPinpointIMU && revIMU != null) {
                 // Reset REV IMU
-                ((BHI260IMU) imu).resetYaw();
+                revIMU.resetYaw();
             }
         } catch (Exception e) {
             telemetry.addData("ERROR", "Failed to reset IMU yaw: " + e.getMessage());
@@ -792,23 +800,19 @@ public abstract class BaseTeleop25152 extends OpMode {
      * Get heading in radians from either Pinpoint or REV IMU
      */
     private double getIMUHeadingRadians() {
-        if (imu == null) return 0.0;
-
         try {
-            if (usingPinpointIMU) {
-                // Get heading from Pinpoint IMU using reflection
-                Class<?> pinpointClass = imu.getClass();
-                java.lang.reflect.Method updateMethod = pinpointClass.getMethod("update");
-                updateMethod.invoke(imu);
-
-                java.lang.reflect.Method getHeadingMethod = pinpointClass.getMethod("getHeading", AngleUnit.class);
-                return (Double) getHeadingMethod.invoke(imu, AngleUnit.RADIANS);
-            } else {
+            if (usingPinpointIMU && pinpointIMU != null) {
+                // Get heading from Pinpoint IMU using proper driver methods
+                pinpointIMU.update();
+                return pinpointIMU.getHeading(AngleUnit.RADIANS);
+            } else if (!usingPinpointIMU && revIMU != null) {
                 // Get heading from REV IMU
-                return ((BHI260IMU) imu).getRobotOrientation(
+                return revIMU.getRobotOrientation(
                         AxesReference.INTRINSIC,
                         AxesOrder.ZYX,
                         AngleUnit.RADIANS).firstAngle;
+            } else {
+                return 0.0;
             }
         } catch (Exception e) {
             telemetry.addData("ERROR", "Failed to get IMU heading: " + e.getMessage());

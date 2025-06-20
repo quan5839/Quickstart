@@ -28,8 +28,8 @@ import pedroPathing.robot_state.RobotStateMachine;
 import pedroPathing.util.ButtonEdgeDetector;
 
 /**
- * This is an example auto that showcases movement and control of two servos autonomously.
- * It is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pickups 3 samples from the ground and scores them before parking.
+ * Blue Alliance Basket Auto - scores preload and 3 samples in basket
+ * This is a 0+4 (Specimen + Sample) bucket auto. It scores a neutral preload and then pickups 3 samples from the ground and scores them before parking.
  * There are examples of different ways to build paths.
  * A path progression method has been created and can advance based on time, position, or other factors.
  *
@@ -37,8 +37,8 @@ import pedroPathing.util.ButtonEdgeDetector;
  * @version 2.0, 11/28/2024
  */
 
-@Autonomous(name = "Basket Auto")
-public class BasketAuto extends OpMode {
+@Autonomous(name = "Blue Basket Auto", group = "Autonomous", preselectTeleOp = "Blue Basket Teleop")
+public class BlueBasketAuto extends OpMode {
 
     private Follower follower;
     private Timer pathTimer, opmodeTimer;
@@ -48,22 +48,9 @@ public class BasketAuto extends OpMode {
     private RobotStateMachine stateMachine;
     private ButtonEdgeDetector buttonDetector = new ButtonEdgeDetector();
 
-    // Team color for autonomous
-    public enum TeamColor {
-        RED(Color.RED, "Red Alliance"),
-        BLUE(Color.BLUE, "Blue Alliance");
-
-        public final int hubColor;
-        public final String displayName;
-
-        TeamColor(int hubColor, String displayName) {
-            this.hubColor = hubColor;
-            this.displayName = displayName;
-        }
-    }
-
-    // Set team color for this autonomous (change as needed)
-    private final TeamColor teamColor = TeamColor.BLUE;
+    // Blue Alliance team color (hard-coded for this auto)
+    private final int teamColor = Color.BLUE;
+    private final String teamColorName = "Blue Alliance";
 
     /** This is the variable where we store the state of our auto.
      * It is used by the pathUpdate method. */
@@ -361,6 +348,7 @@ public class BasketAuto extends OpMode {
                 if(!follower.isBusy()) {
                     robot.outtake.setElbowPosition(OuttakeConstants.ELBOW_PARK);
                     robot.outtake.setWristPosition(0.3);
+
                     setPathState(-1);
                 }
                 break;
@@ -453,7 +441,6 @@ public class BasketAuto extends OpMode {
             telemetry.addData("State Error", "Failed to start intake sequence");
         }
     }
-
 
 
 
@@ -552,7 +539,7 @@ public class BasketAuto extends OpMode {
         buildPaths();
 
         telemetry.addData("Status", "Hardware Initialized");
-        telemetry.addData("Team Color", teamColor.displayName);
+        telemetry.addData("Team Color", teamColorName);
         telemetry.update();
     }
 
