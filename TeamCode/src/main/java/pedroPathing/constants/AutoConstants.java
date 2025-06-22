@@ -13,7 +13,7 @@ public class AutoConstants {
     // ========== SHARED TIMING CONSTANTS ==========
     
     /** Intake slide wait time (ms) */
-    public static long INTAKE_SLIDE_WAIT_TIME = 2000;
+    public static long INTAKE_SLIDE_WAIT_TIME = 2300;
     
     /** Outtake claw release time (ms) */
     public static long OUTTAKE_CLAW_RELEASE = 1500;

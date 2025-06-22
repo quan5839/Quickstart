@@ -40,7 +40,7 @@ public class SpecimenAutoConstants {
     public static double GRAB_SCORE_HEADING_DEG = 0;
     
     /** Grab specimen X position (inches) */
-    public static double GRAB_SPECIMEN_X = 13;
+    public static double GRAB_SPECIMEN_X = 14;
 
     // ========== PARK POSITIONS ==========
     

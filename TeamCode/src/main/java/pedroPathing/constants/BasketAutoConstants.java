@@ -39,7 +39,7 @@ public class BasketAutoConstants {
     public static double PICKUP1_X = 11.5;
     
     /** Pickup 1 Y position (inches) */
-    public static double PICKUP1_Y = 118.25;
+    public static double PICKUP1_Y = 118.5;
     
     /** Pickup 2 heading (degrees) */
     public static double PICKUP2_HEADING_DEG = 354;
@@ -48,7 +48,7 @@ public class BasketAutoConstants {
     public static double PICKUP2_X = 13.5;
     
     /** Pickup 2 Y position (inches) */
-    public static double PICKUP2_Y = 126.5;
+    public static double PICKUP2_Y = 126.8;
     
     /** Pickup 3 heading (degrees) */
     public static double PICKUP3_HEADING_DEG = 0;
